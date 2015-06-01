@@ -1,0 +1,14 @@
+D:\GoogleDrive\Dev\GitHub\Archive\DB\ArchiveDb\ArchiveDb\bin\Debug\ArchiveDb.dacpac
+D:\GoogleDrive\Dev\GitHub\Archive\DB\ArchiveDb\ArchiveDb\bin\Debug\ArchiveDb.dll
+D:\GoogleDrive\Dev\GitHub\Archive\DB\ArchiveDb\ArchiveDb\bin\Debug\ArchiveDb.pdb
+D:\GoogleDrive\Dev\GitHub\Archive\DB\ArchiveDb\ArchiveDb\obj\Debug\ArchiveDb.dll
+D:\GoogleDrive\Dev\GitHub\Archive\DB\ArchiveDb\ArchiveDb\obj\Debug\ArchiveDb.pdb
+D:\GoogleDrive\Dev\GitHub\Archive\Code\Archive\ArchiveDb\bin\Debug\ArchiveDb.dacpac
+D:\GoogleDrive\Dev\GitHub\Archive\Code\Archive\ArchiveDb\bin\Debug\ArchiveDb.dll
+D:\GoogleDrive\Dev\GitHub\Archive\Code\Archive\ArchiveDb\bin\Debug\ArchiveDb.pdb
+D:\GoogleDrive\Dev\GitHub\Archive\Code\Archive\ArchiveDb\obj\Debug\ArchiveDb.dll
+D:\GoogleDrive\Dev\GitHub\Archive\Code\Archive\ArchiveDb\obj\Debug\ArchiveDb.pdb
+D:\GoogleDrive\Dev\GitHub\Archive\Code\Archive\ArchiveDb\obj\Debug\Model.xml
+D:\GoogleDrive\Dev\GitHub\Archive\Code\Archive\ArchiveDb\obj\Debug\refactor.xml
+D:\GoogleDrive\Dev\GitHub\Archive\Code\Archive\ArchiveDb\obj\Debug\postdeploy.sql
+D:\GoogleDrive\Dev\GitHub\Archive\Code\Archive\ArchiveDb\obj\Debug\predeploy.sql
