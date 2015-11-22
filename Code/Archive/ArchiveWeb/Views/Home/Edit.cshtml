@@ -1,0 +1,54 @@
+﻿@using ArchiveWeb.Models
+@model ArchiveWeb.Models.Document
+
+@{
+    ViewBag.Title = "Карточка документа";
+    Layout = "~/Views/Shared/_Editor.cshtml";
+}
+
+@section PanelHead
+{
+    Карточка документа №@Model.Id от @Model.DateCreate.ToString("dd.MM.yyyy")
+    <a class="btn btn-warning pull-right">Изменить</a>
+}
+@section PanelBody
+{
+    <div class="form-horizontal">
+    <div class="form-group">
+        <label class="col-lg-2 control-label no-pad-top" for="docType">Тип документа</label>
+        <div class="col-lg-4">
+            @Model.DocType
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label no-pad-top" for="docNumber">Номер документа</label>
+        <div class="col-lg-2">
+            @Model.DocNumber
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label no-pad-top" for="docDate">Дата документа</label>
+        <div class="col-lg-2">
+            @Model.DocDate.ToString("dd.MM.yyyy")
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label no-pad-top" for="docContractor">Контрагент</label>
+        <div class="col-lg-6">
+            @Model.ContractorName
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label no-pad-top" for="organization">Юр. лицо Юнит</label>
+        <div class="col-lg-4">
+            @Model.Organization
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label no-pad-top" for="sheetCount">Количество листов</label>
+        <div class="col-lg-2">
+            @Model.SheetCount
+        </div>
+    </div>
+</div>
+}

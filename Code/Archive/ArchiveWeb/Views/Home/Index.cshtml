@@ -1,10 +1,12 @@
-﻿@using ArchiveWeb.Models
+﻿@model IEnumerable<Document>
+
+@using ArchiveWeb.Models
 @{
     ViewBag.Title = "Список документов";
 }
 
 
-<div class="panel panel-default" id="filter">
+@*<div class="panel panel-default" id="filter">
     <div id="filterPanel" class="panel-collapse collapse">
         <div class="panel-body">
             <div class="form-horizontal val-form" role="form">
@@ -14,8 +16,6 @@
                         <input type="text" id="filterIdClaim" class="form-control input-sm" />
                     </div>
                 </div>
-
-
                 <div class="form-group">
                     <label class="col-sm-2 control-label">Показать записей</label>
                     <div class="col-sm-10">
@@ -26,7 +26,6 @@
                     <div class="col-sm-offset-2 col-sm-10">
                         <button type="button" class="btn btn-primary"><i class="fa fa-search"></i>&nbsp;найти</button>
                         <button type="button" class="btn btn-default"><i class="fa fa-repeat"></i>&nbsp;очистить</button>
-                        @*<button type="button" id="saveFilterInExcel" class="btn btn-default"><i class="fa fa-download"></i>&nbsp;в Excel</button>*@
                     </div>
                 </div>
             </div>
@@ -37,19 +36,56 @@
             <a class="title"><i class="fa fa-filter"></i></a>
         </div>
     </div>
-</div>
+</div>*@
 
-@if (ViewBag.DocumentList.Count > 0)
-{
-    <table class="table table-bordered">
-        <tr>
-            <th>DocNumber</th>
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr class="bg-primary">
+            <th>
+                <input id="docNumber" class="form-control input-xs" placeholder="№ документа"/>
+            </th>
+            <th>
+                <input id="docDate" class="form-control input-xs" placeholder="Дата документа" />
+            </th>
+            <th>
+                <input id="docType" class="form-control input-xs" placeholder="Тип документа" />
+            </th>
+            <th>
+                <input id="dateCreate" class="form-control input-xs" placeholder="Дата приема" />
+            </th>
+            <th>
+                <input id="state" class="form-control input-xs" placeholder="Статус" />
+            </th>
+            <th>
+                <input id="place" class="form-control input-xs" placeholder="Местоположение" />
+            </th>
+            <th></th>
         </tr>
-        @foreach (Document doc in ViewBag.DocumentList)
-        {
-            <tr>
-                <td>@doc.DocNumber</td>
-            </tr>
-        }
-    </table>
+    </thead>
+    @foreach (Document doc in Model)
+    {
+        <tr class="doc-row" id="@doc.Id">
+            <td>@doc.DocNumber</td>
+            <td>@doc.DocDate.ToString("dd.MM.yyyy")</td>
+            <td>@doc.DocType</td>
+            <td>@doc.DateCreate.ToString("dd.MM.yyyy")</td>
+            <td>@doc.State</td>
+            <td>Местоположение</td>
+            <td></td>
+        </tr>
+    }
+</table>
+
+@section scripts
+{
+    <script type="text/javascript">
+        $(function () {
+            $()
+
+            $('tr.doc-row').click(function() {
+                var id = $(this).attr('id');
+                window.open('@Url.Action("Edit")?id=' + id);
+            });
+        });
+    </script>
 }

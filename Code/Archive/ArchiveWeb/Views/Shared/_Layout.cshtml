@@ -28,10 +28,16 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li>
-                        <a href='@Url.Action("Request", "Home")'>
+                        <a href='@Url.Action("Add", "Home")' class="nav-btn-primary" target="_blank">
+                            <i class="fa fa-plus"></i> Прием документа
+                        </a>
+                    </li>
+                    <li>
+                        <a href='@Url.Action("Request", "Home")' class="nav-btn-warning" target="_blank">
                             <i class="fa fa-plus"></i> Новый запрос
                         </a>
                     </li>
+
                     @*<li>@Html.ActionLink("Новый запрос", "Request", "Home")</li>*@
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
@@ -48,7 +54,11 @@
         <footer>
             <div class="pull-left">
                 <h5>
-                    &copy; @DateTime.Now.Year - UN1T
+                    2015 @if (DateTime.Now.Year > 2015)
+                    {
+                        @String.Format("- {0}", DateTime.Now.Year);
+                    }
+                    &copy; UN1T
                     <br />
                     <small>v&nbsp;1.0</small>
                 </h5>

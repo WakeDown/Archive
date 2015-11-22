@@ -111,3 +111,46 @@ input[type="checkbox"].input-validation-error {
 #filterPanel {
     background: #eee;
 }
+
+.nav-btn-primary {
+    color: #fff !important;
+  background-color: #337ab7 !important;   
+}
+
+.nav-btn-primary:hover {
+    color: #fff !important;
+  background-color: #286090 !important;
+  border-color: #204d74 !important;
+}
+
+.nav-btn-warning {
+    color: #fff !important;
+  background-color: #f0ad4e !important;   
+}
+
+.nav-btn-warning:hover {
+    color: #fff !important;
+  background-color: #ec971f !important;
+  border-color: #d58512 !important;
+}
+
+input.required-mark, select.required-mark, span.required-mark, textarea.required-mark {
+    background-color: #F7F1D4;
+}
+
+tr.doc-row:hover {
+    background-color: #F7F1D4 !important;
+    cursor: pointer;
+}
+
+.no-pad-top {
+    padding-top: 0 !important;
+}
+
+.input-xs {
+    height: 25px;
+  padding: 2px 5px;
+  font-size: 10px;
+  line-height: 1.5;
+  border-radius: 3px; 
+}

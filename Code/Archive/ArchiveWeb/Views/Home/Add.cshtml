@@ -1,0 +1,135 @@
+﻿@using ArchiveWeb.Models
+@model ArchiveWeb.Models.Document
+
+@{
+    ViewBag.Title = "Прием документа";
+    Layout = "~/Views/Shared/_Editor.cshtml";
+}
+
+@section PanelHead
+{
+    Прием документа
+}
+
+
+@section PanelBody
+{
+
+    @using (Html.BeginForm("Add", "Home", FormMethod.Post, new { @class = "form-horizontal", enctype = "multipart/form-data", role = "form" }))
+    {
+        <div class="form-group">
+                <label class="col-lg-2 control-label" for="docType">Тип документа</label>
+                <div class="col-lg-4">
+                    @Html.DropDownListFor(m => m.IdDocType, new SelectList(DocType.GetList(), "Id", "Name"), "--выберите тип документа--", new { @class = "form-control required-mark", @id = "docType", required = "required", data_error = "Выберите Тип документа" })
+                    <span class="help-block with-errors"></span>
+                </div>
+            </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label" for="docNumber">Номер документа</label>
+            <div class="col-lg-2">
+                    @Html.TextBoxFor(m => m.DocNumber, new {@class = "form-control required-mark", @id = "docNumber", required = "required" })
+                <span class="help-block with-errors"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label" for="docDate">Дата документа</label>
+            <div class="col-lg-2">
+                @Html.TextBoxFor(m => m.DocDate, new {@class = "form-control required-mark", @id = "docDate", required = "required" })
+                <span class="help-block with-errors"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label" for="docContractor">Контрагент</label>
+            <div class="col-lg-6">
+                <div class="input-group">
+                    <div class="input-group-btn" style="width: 150px;">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="поиск" id="ctrSearch"/>
+                            <div class="input-group-btn"><a href="#!"><i class="fa fa-search"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    @Html.DropDownListFor(m => m.IdContractor, new SelectList(new List<string>()), "--введите поиск--", new {@class = "form-control required-mark", @id = "docContractor", required = "required", data_error = "Выберите Контрагента"})
+                </div>
+                <span class="help-block with-errors"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label" for="organization">Юр. лицо Юнит</label>
+            <div class="col-lg-4">
+                @Html.DropDownListFor(m => m.IdOrganization, new SelectList(Organization.GetSelectionList(), "Key", "Value"), "--выберите юр. лицо--", new {@class = "form-control required-mark", @id = "organization", required = "required", data_error = "Выберите Юр. лицо Юнит"})
+                <span class="help-block with-errors"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label" for="sheetCount">Количество листов</label>
+            <div class="col-lg-2">
+                @Html.TextBoxFor(m => m.SheetCount, new { @class = "form-control required-mark", @id = "sheetCount", required="required" })
+                <span class="help-block with-errors"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">Скан</label>
+            <div class="col-lg-5">
+                <input type="file" name="file" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-lg-push-2 col-lg-5">
+                @*<a type="submit" class="btn btn-primary btn-sm" href="#"><i class="fa fa-save"></i>&nbsp;добавить</a>*@
+                <button id="btnCreate" type="submit" class="btn btn-success" name="action" value="Create"><i class="fa fa-save"></i>&nbsp;добавить</button>
+            </div>
+        </div>
+        if (TempData["error"] != null)
+         {
+             <div class="form-group">
+                 <div class="col-lg-push-2 col-lg-5">
+                     <blockquote class="alert-danger">@TempData["error"]</blockquote>
+                 </div>
+             </div>
+         }
+    }
+}
+
+@section scripts
+{
+    <script type="text/javascript">
+        $(function() {
+            $('#docDate').datepicker({
+                autoclose: true,
+                todayBtn: "linked",
+                language: "ru"
+            });
+            $('#ctrSearch').keypress(function(e) {
+                if (e.which !== 13) return;
+                ctrSearch(e);
+            });
+            $('#ctrSearch').on('input', ctrSearch);
+        });
+
+        function ctrSearch(e) {
+            var $ctrElem = $('#docContractor');
+            $ctrElem.find('option').remove();
+            var ctr = $('#ctrSearch').val();
+
+            if (ctr != '' && ctr.length >= 3) {
+                $.ajax({
+                    url: '@Url.Action("GetContractorList")',
+                    method: 'POST',
+                    data: { name: ctr },
+                    success: function(data) {
+                        if (data.length > 0) {
+                            for (var i = 0; i < data.length; i++) {
+                                var item = data[i];
+                                var opt = '<option value="' + item.Key + '">' + item.Value + '</option>';
+                                $ctrElem.append(opt);
+                            }
+                        } else {
+                            $ctrElem.append('<option value="">ничего не найдено</option>');
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+}
