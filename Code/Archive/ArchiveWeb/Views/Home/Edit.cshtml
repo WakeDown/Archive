@@ -1,4 +1,5 @@
 ﻿@using ArchiveWeb.Models
+@using ArchiveWeb.Objects
 @model ArchiveWeb.Models.Document
 
 @{
@@ -9,7 +10,7 @@
 @section PanelHead
 {
     Карточка документа №@Model.Id от @Model.DateCreate.ToString("dd.MM.yyyy")
-    <a class="btn btn-warning pull-right">Изменить</a>
+    @*<a class="btn btn-warning pull-right">Изменить</a>*@
 }
 @section PanelBody
 {
@@ -17,7 +18,14 @@
     <div class="form-group">
         <label class="col-lg-2 control-label no-pad-top" for="docType">Тип документа</label>
         <div class="col-lg-4">
-            @Model.DocType
+            @if (String.IsNullOrEmpty(Model.FileSid))
+            {
+                @Model.DocType
+            }
+            else
+            {
+                <a href="@Url.Action("GetDocFileData", new {sid = Model.FileSid})" target="_blank">@Model.DocType</a>
+            }
         </div>
     </div>
     <div class="form-group">
@@ -36,19 +44,128 @@
         <label class="col-lg-2 control-label no-pad-top" for="docContractor">Контрагент</label>
         <div class="col-lg-6">
             @Model.ContractorName
+            <div><small id="contractorFullName">&nbsp;</small></div>
         </div>
     </div>
     <div class="form-group">
         <label class="col-lg-2 control-label no-pad-top" for="organization">Юр. лицо Юнит</label>
-        <div class="col-lg-4">
+        <div class="col-lg-10">
             @Model.Organization
+            <div>
+                <small id="organizationFullName">&nbsp;</small>
+            </div>
         </div>
     </div>
-    <div class="form-group">
-        <label class="col-lg-2 control-label no-pad-top" for="sheetCount">Количество листов</label>
-        <div class="col-lg-2">
-            @Model.SheetCount
+        <div class="form-group">
+            <label class="col-lg-2 control-label no-pad-top" for="sheetCount">Количество листов</label>
+            <div class="col-lg-4">
+                @Model.SheetCount
+            </div>
         </div>
-    </div>
+        
+        @using (Html.BeginForm("Edit", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.HiddenFor(m=>m.Id)
+
+            <div class="form-group">
+                <label class="col-lg-2 control-label no-pad-top">Скан</label>
+                <div class="col-lg-2">
+                    @if (String.IsNullOrEmpty(Model.FileName))
+                    {
+                        <input type="file" name="file" />
+                    }
+                    else
+                    {
+                        <a href="@Url.Action("GetDocFileData", new {sid = Model.FileSid})" target="_blank">файл №@Model.Id</a>
+                        if (ViewBag.CurUser.HasAccess(AdGroup.ArchiveDeleteFile))
+                        {
+                            <a id="deleteFile" class="btn btn-danger btn-sm"><i class="fa fa-remove"></i>&nbsp;удалить файл</a>
+                        }
+                    }
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label no-pad-top">Местоположение</label>
+                <div class="col-lg-4">
+                    <table class="table table-bordered">
+                        <tr>
+                            <td>Стеллаж</td>
+                            <td>
+                                @Html.TextBoxFor(m => m.Stack, new { @class = "form-control required-mark", @id = "stack", required = "required" })
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Полка</td>
+                            <td>
+                                @Html.TextBoxFor(m => m.Shelf, new { @class = "form-control required-mark", @id = "shelf", required = "required" })
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Папка</td>
+                            <td>
+                                @Html.TextBoxFor(m => m.Folder, new { @class = "form-control required-mark", @id = "folder", required = "required" })
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-lg-push-2 col-lg-8">
+                    @*<a type="submit" class="btn btn-primary btn-sm" href="#"><i class="fa fa-save"></i>&nbsp;добавить</a>*@
+                    @*<button id="btnCreate" type="submit" class="btn btn-success" name="action" value="Create"><i class="fa fa-save"></i>&nbsp;сохранить</button>*@
+                    <a href="@Url.Action("Card", new {id = Model.Id})" class="btn btn-danger"><i class="fa fa-remove"></i>&nbsp;отмена</a>
+                    <button id="btnCreateAndClose" type="submit" class="btn btn-success" name="CreateAndClose" value="CreateAndClose"><i class="fa fa-save"></i>&nbsp;Сохранить и закрыть</button>
+                    <button id="btnCreateAndContinue" type="submit" class="btn btn-success" name="CreateAndContinue" value="CreateAndContinue"><i class="fa fa-save"></i>&nbsp;Сохранить и продолжить</button>
+                </div>
+            </div>
+            if (TempData["error"] != null)
+            {
+                <div class="form-group">
+                    <div class="col-lg-push-2 col-lg-5">
+                        <blockquote class="alert-danger">@TempData["error"]</blockquote>
+                    </div>
+                </div>
+            }
+        }
 </div>
+}
+
+@section scripts
+{
+    <script type="text/javascript">
+        $(function() {
+            $('#deleteFile').click(function() {
+                $.ajax({
+                    url: '@Url.Action("DeleteFile")',
+                    method: 'POST',
+                    data: { sid: '@Model.FileSid' },
+                    success: function() {
+                        window.location.reload();
+                    },
+                    error: function() {
+                        alert('ошибка при удалении файла!');
+                    }
+                });
+            });
+            var idCont = @Model.IdContractor;
+            $.ajax({
+                url: '@Url.Action("GetContractorFullName")',
+                method: 'POST',
+                data: { id: idCont },
+                success: function (data) {
+                    $('#contractorFullName').text(data);
+                }
+            });
+            
+            var idOrg = @Model.IdOrganization;
+            $.ajax({
+                url: '@Url.Action("GetContractorFullName")',
+                method: 'POST',
+                data: { id: idOrg },
+                success: function (data) {
+                    $('#organizationFullName').text(data);
+                }
+            });
+        })
+    </script>
 }

@@ -2,6 +2,7 @@
 /// <reference path="bootstrap.js" />
 /// <reference path="bootstrap-datepicker.js" />
 /// <reference path="bootstrap-datepicker.ru.js" />
+/// <reference path="bootstrap-dialog.js" />
 /// <reference path="bootstrapValidator.js" />
 /// <reference path="BootstrapValidator/language/en_US.js" />
 /// <reference path="BootstrapValidator/language/ru_RU.js" />

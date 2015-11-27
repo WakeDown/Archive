@@ -21,6 +21,7 @@ namespace ArchiveWeb
                       "~/Scripts/bootstrap.js",
                         "~/Scripts/bootstrap-datepicker.js",
                         "~/Scripts/bootstrap-datepicker.ru.js",
+                        "~/Scripts/bootstrap-dialog.js",
                       "~/Scripts/BootstrapValidator/language/ru_RU.js",
                       "~/Scripts/bootstrapValidator.js",
                       "~/Scripts/respond.js"));

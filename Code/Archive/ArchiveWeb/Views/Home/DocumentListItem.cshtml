@@ -1,0 +1,62 @@
+﻿@model ArchiveWeb.Models.Document
+    
+<tr class="doc-row" id="@Model.Id" @(String.IsNullOrEmpty(Model.Stack) && String.IsNullOrEmpty(Model.Shelf) && String.IsNullOrEmpty(Model.Folder) ? "noplace=noplace" : String.Empty)>
+    <th>@Model.Id</th>
+    <td>@Model.DocNumber</td>
+    <td>@Model.DocDate.ToString("dd.MM.yyyy")</td>
+    <td>
+        @if (String.IsNullOrEmpty(Model.FileSid))
+            {
+            @Model.DocType
+        }
+        else
+        {
+            <a name="fileLink" href="@Url.Action("GetDocFileData", new {sid = Model.FileSid})" target="_blank">@Model.DocType</a>
+        }
+    </td>
+    <td>@Model.ContractorName</td>
+    @*<td>@Model.DateCreate.ToString("dd.MM.yyyy")<div class="small">@Model.CreatorName</div></td>*@
+    <td>
+        @Model.State
+        <div><small>@(Model.DateStateChange.HasValue ? Model.DateStateChange.Value.ToString("dd.MM.yyyy HH:mm") : String.Empty)</small>
+        </div>
+        @if (Model.DocStateSysName.Equals("OUT"))
+        {
+            <div>
+                <small>@Model.WhoGetName</small>
+            </div>
+        }
+        else
+        {
+            <div>
+                <small>@Model.StateChangerName</small>
+            </div>
+        }
+    </td>
+@if (ViewBag.PlaceView != null && ViewBag.PlaceView)
+{
+    <td>
+        <div><small>Стеллаж - @(Model.Stack ?? "неизвестно")</small>
+        </div>
+        <div><small>Полка - @(Model.Shelf ?? "неизвестно")</small>
+        </div>
+        <div><small>Папка - @(Model.Folder ?? "неизвестно")</small>
+        </div>
+    </td>
+}
+    
+@if (ViewBag.PlaceView != null && ViewBag.PlaceView)
+{
+    <td>
+        @if (Model.DocStateSysName.Equals("NEW") || Model.DocStateSysName.Equals("OUT"))
+        {
+            <a name="archive" class="btn btn-success btn-sm" title="В архив"><i class="fa fa-reply"></i></a>
+        }
+        else if (Model.DocStateSysName.Equals("ARCHIVE"))
+        {
+            <a name="out" class="btn btn-warning btn-sm" title="Выдать"><i class="fa fa-mail-forward"></i></a>
+        }
+    </td>
+}
+</tr>
+

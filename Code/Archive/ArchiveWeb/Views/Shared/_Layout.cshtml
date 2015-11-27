@@ -1,4 +1,5 @@
-﻿@using Microsoft.Ajax.Utilities
+﻿@using ArchiveWeb.Objects
+@using Microsoft.Ajax.Utilities
 <!DOCTYPE html>
 <html>
 <head>
@@ -27,17 +28,22 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li>
-                        <a href='@Url.Action("Add", "Home")' class="nav-btn-primary" target="_blank">
-                            <i class="fa fa-plus"></i> Прием документа
-                        </a>
-                    </li>
-                    <li>
-                        <a href='@Url.Action("Request", "Home")' class="nav-btn-warning" target="_blank">
-                            <i class="fa fa-plus"></i> Новый запрос
-                        </a>
-                    </li>
-
+                    @if (ViewBag.CurUser.HasAccess(AdGroup.ArchiveAddDoc))
+                    {
+                        <li>
+                            <a href='@Url.Action("Add", "Home")' class="nav-btn-primary" target="_blank">
+                                <i class="fa fa-plus"></i> Прием документа
+                            </a>
+                        </li>
+                    }
+@if (ViewBag.CurUser.HasAccess(AdGroup.ArchiveCreateClaim))
+{
+    <li>
+        <a href='@Url.Action("RequestDoc", "Home")' class="nav-btn-warning" target="_blank">
+            <i class="fa fa-plus"></i> Новый запрос
+        </a>
+    </li>
+}
                     @*<li>@Html.ActionLink("Новый запрос", "Request", "Home")</li>*@
                 </ul>
                 <ul class="nav navbar-nav navbar-right">

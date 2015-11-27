@@ -13,6 +13,22 @@ body {
     padding-right: 15px;
 }
 
+@media (min-width: 768px) {
+  .container {
+    width: 750px;
+  }
+}
+@media (min-width: 992px) {
+  .container {
+    width: 1170px;
+  }
+}
+@media (min-width: 1200px) {
+  .container {
+    width: 100%;
+  }
+}
+
 /* Set width on the form input elements since they're 100% wide by default */
 /*input,
 select,
@@ -153,4 +169,35 @@ tr.doc-row:hover {
   font-size: 10px;
   line-height: 1.5;
   border-radius: 3px; 
+}
+
+.updated-row {
+    /*border: 1px solid red;*/
+    -webkit-animation-name: updated-row; /* Chrome, Safari, Opera */
+    -webkit-animation-duration: 4s; /* Chrome, Safari, Opera */
+    animation-name: updated-row;
+    animation-duration: 4s;
+}
+
+/* Chrome, Safari, Opera */
+@-webkit-keyframes updated-row {
+    0% {background-color: #ffecb3;}
+    100% {background-color: #fff;}
+}
+
+/* Standard syntax */
+@keyframes updated-row {
+    0% {background-color: #ffecb3;}
+    100% {background-color: #fff;}
+}
+
+.text-sm {
+    font-size: 0.8em;
+}
+.no-marg-bot {
+    margin-bottom: 0 !important;
+}
+.min-width{
+    min-width: 1px;
+    width: 1px;
 }

@@ -120,18 +120,22 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\PlaceController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\AdHelper.cs" />
     <Compile Include="Helpers\DbHelper.cs" />
     <Compile Include="Helpers\MainHelper.cs" />
+    <Compile Include="Helpers\UrlHelperExtension.cs" />
     <Compile Include="Models\Contractor.cs" />
     <Compile Include="Models\DocState.cs" />
     <Compile Include="Models\DocType.cs" />
     <Compile Include="Models\Document.cs" />
+    <Compile Include="Models\Employee.cs" />
     <Compile Include="Models\Organization.cs" />
     <Compile Include="Models\AdUser.cs" />
+    <Compile Include="Models\Place.cs" />
     <Compile Include="Objects\AdGroup.cs" />
     <Compile Include="Objects\AdUserGroup.cs" />
     <Compile Include="Objects\BaseController.cs" />
@@ -158,9 +162,12 @@
     <Content Include="Content\fonts\fontawesome-webfont.eot" />
     <Content Include="Content\fonts\FontAwesome.otf" />
     <Compile Include="Helpers\Db\Db.Archive.cs" />
+    <None Include="Properties\PublishProfiles\2. Test.pubxml" />
+    <None Include="Properties\PublishProfiles\3. Production.pubxml" />
     <None Include="Scripts\jquery-2.1.4.intellisense.js" />
     <Content Include="Icon.png" />
     <Content Include="Scripts\bootstrap-datepicker.ru.js" />
+    <Content Include="Scripts\bootstrap-dialog.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrapValidator.js" />
     <Content Include="Scripts\BootstrapValidator\language\en_US.js" />
@@ -220,23 +227,30 @@
     <Content Include="Scripts\npm.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\_references.js" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
     <Content Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="Views\Home\Request.cshtml" />
+    <Content Include="Views\Home\RequestDoc.cshtml" />
     <Content Include="Views\Error\AccessDenied.cshtml" />
     <Content Include="Views\Home\Add.cshtml" />
     <Content Include="Views\Shared\_Editor.cshtml" />
     <Content Include="Views\Home\Edit.cshtml" />
+    <Content Include="Views\Home\Card.cshtml" />
+    <Content Include="Views\Home\DocumentListItem.cshtml" />
+    <Content Include="Views\Shared\WindowClose.cshtml" />
+    <Content Include="Views\Place\Index.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

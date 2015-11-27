@@ -1,91 +1,555 @@
 ﻿@model IEnumerable<Document>
 
+@using ArchiveWeb.Helpers
 @using ArchiveWeb.Models
 @{
     ViewBag.Title = "Список документов";
+    int topRows = Request.QueryString["topRows"] != null ? Convert.ToInt32(Request.QueryString["topRows"]) : 30;
+    int currPage = Request.QueryString["page"] != null ? Convert.ToInt32(Request.QueryString["page"]) : 1;
+    int pageCount = (ViewBag.TotalCount / topRows);
+    if (ViewBag.TotalCount % topRows > 0)
+    {
+        pageCount++;
+    }
 }
 
 
 @*<div class="panel panel-default" id="filter">
-    <div id="filterPanel" class="panel-collapse collapse">
-        <div class="panel-body">
-            <div class="form-horizontal val-form" role="form">
-                <div class="form-group">
-                    <label class="col-sm-2 control-label">ID</label>
-                    <div class="col-sm-10">
-                        <input type="text" id="filterIdClaim" class="form-control input-sm" />
+        <div id="filterPanel" class="panel-collapse collapse">
+            <div class="panel-body">
+                <div class="form-horizontal val-form" role="form">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">ID</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="filterIdClaim" class="form-control input-sm" />
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-2 control-label">Показать записей</label>
-                    <div class="col-sm-10">
-                        <input type="text" id="filterRowCount" class="form-control input-sm" value="10" />
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Показать записей</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="filterRowCount" class="form-control input-sm" value="10" />
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-sm-offset-2 col-sm-10">
-                        <button type="button" class="btn btn-primary"><i class="fa fa-search"></i>&nbsp;найти</button>
-                        <button type="button" class="btn btn-default"><i class="fa fa-repeat"></i>&nbsp;очистить</button>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <button type="button" class="btn btn-primary"><i class="fa fa-search"></i>&nbsp;найти</button>
+                            <button type="button" class="btn btn-default"><i class="fa fa-repeat"></i>&nbsp;очистить</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div id="filterHead" class="panel-heading">
-        <div class="panel-title collapsed" data-toggle="collapse" data-target="#filterPanel">
-            <a class="title"><i class="fa fa-filter"></i></a>
+        <div id="filterHead" class="panel-heading">
+            <div class="panel-title collapsed" data-toggle="collapse" data-target="#filterPanel">
+                <a class="title"><i class="fa fa-filter"></i></a>
+            </div>
+        </div>
+    </div>*@
+<div class="row">
+    <div class="col-lg-3 col-sm-12 col-xs-12 hidden-sm hidden-xs">
+        <div class="pull-left">
+            <nav>
+                <ul class="pagination nomargin pages">
+
+                    <li name="page" class="@(currPage == 1 ? "disabled" : String.Empty)"><a href="@Url.Current(new {page = Convert.ToInt32(Request.QueryString["page"]) - 1})"><</a></li>
+
+                    @for (int i = 1; i <= pageCount; i++)
+                    {
+                        if (i > 4)
+                        {
+                            <li name="page" class="@(i == currPage ? "active" : String.Empty)"><a href="@Url.Current(new {page = i})">...</a></li>
+                            break;
+
+                        }
+                        else
+                        {
+                            <li name="page" class="@(i == currPage ? "active" : String.Empty)"><a href="@Url.Current(new {page = i})">@i</a></li>
+                        }
+                    }
+
+                    <li name="page" class="@(currPage == pageCount ? "disabled" : String.Empty)"><a href="@Url.Current(new {page = Convert.ToInt32(Request.QueryString["page"]) + 1})">></a></li>
+
+                </ul>
+            </nav>
         </div>
     </div>
-</div>*@
-
-<table class="table table-bordered table-striped">
+    <div class="col-lg-7 col-sm-12 col-xs-12">
+        <div id="stateFilter"></div>
+    </div>
+    <div class="col-lg-2 col-sm-6 col-xs-6">
+        <div>
+            <div class="text-right">
+                <nav>
+                    <ul class="pagination pagesize nomargin">
+                        <li><a name="pageSize" value="30" href="@Url.Current(new { topRows=30, page=1})" class="btn btn-default btn-sm selected">30</a></li>
+                        <li><a name="pageSize" value="100" href="@Url.Current(new { topRows=100, page=1})" class="btn btn-default btn-sm">100</a></li>
+                        <li><a name="pageSize" value="300" href="@Url.Current(new { topRows=300, page=1})" class="btn btn-default btn-sm">300</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<table id="docList" class="table table-bordered table-striped">
     <thead>
         <tr class="bg-primary">
-            <th>
-                <input id="docNumber" class="form-control input-xs" placeholder="№ документа"/>
+            <th class="min-width">
+                <input id="idDoc" class="form-control input-xs" placeholder="ID" value="@Request.QueryString["idDoc"]" style="width:50px;" />
             </th>
             <th>
-                <input id="docDate" class="form-control input-xs" placeholder="Дата документа" />
+                <input id="docNumber" class="form-control input-xs" placeholder="№ документа" value="@Request.QueryString["docNum"]" />
             </th>
             <th>
-                <input id="docType" class="form-control input-xs" placeholder="Тип документа" />
+                <input id="docDate" class="form-control input-xs" placeholder="Дата документа" value="@Request.QueryString["docDate"]" />
             </th>
             <th>
-                <input id="dateCreate" class="form-control input-xs" placeholder="Дата приема" />
+                <input id="docType" class="form-control input-xs" placeholder="Тип документа" value="@Request.QueryString["docType"]" />
             </th>
             <th>
-                <input id="state" class="form-control input-xs" placeholder="Статус" />
+                <input id="contractor" class="form-control input-xs" placeholder="Контрагент" value="@Request.QueryString["contractor"]" />
             </th>
+            @*<th>
+                    <input id="dateCreate" class="form-control input-xs" placeholder="Создано" value="@Request.QueryString["dateCreate"]" />
+                </th>*@
             <th>
-                <input id="place" class="form-control input-xs" placeholder="Местоположение" />
+                <input id="state" class="form-control input-xs" placeholder="Статус" value="@Request.QueryString["state"]" />
             </th>
-            <th></th>
+            @if (ViewBag.PlaceView != null && ViewBag.PlaceView)
+            {
+                <th>
+                    <input id="place" class="form-control input-xs" placeholder="Местоположение" value="@Request.QueryString["place"]" />
+                </th>
+            }
+            @if (ViewBag.PlaceView != null && ViewBag.PlaceView)
+            {
+                <th>
+                    <a href="@Url.Action("Index")" class="btn btn-default btn-sm" title="очистить фильтр"><i class="fa fa-refresh"></i></a>
+                </th>
+            }
         </tr>
     </thead>
     @foreach (Document doc in Model)
     {
-        <tr class="doc-row" id="@doc.Id">
-            <td>@doc.DocNumber</td>
-            <td>@doc.DocDate.ToString("dd.MM.yyyy")</td>
-            <td>@doc.DocType</td>
-            <td>@doc.DateCreate.ToString("dd.MM.yyyy")</td>
-            <td>@doc.State</td>
-            <td>Местоположение</td>
-            <td></td>
-        </tr>
+        @Html.Partial("DocumentListItem", doc);
+        @*<tr class="doc-row" id="@doc.Id">
+                <td>@doc.DocNumber</td>
+                <td>@doc.DocDate.ToString("dd.MM.yyyy")</td>
+                <td>@doc.DocType</td>
+                <td>@doc.DateCreate.ToString("dd.MM.yyyy")<div class="small">@doc.CreatorName</div></td>
+                <td>@doc.State<div class="small">@(doc.DateStateChange.HasValue ? doc.DateStateChange.Value.ToString("dd.MM.yyyy HH:mm"):String.Empty)</div><div class="small">@doc.StateChangerName</div></td>
+                <td>
+                    <div class="small">Стеллаж - @(doc.Stack ?? "неизвестно")</div>
+                    <div class="small">Полка - @(doc.Shelf ?? "неизвестно")</div>
+                    <div class="small">Папка - @(doc.Folder ?? "неизвестно")</div></td>
+                <td>
+                    @if (doc.DocStateSysName.Equals("NEW") || doc.DocStateSysName.Equals("OUT"))
+                    {
+                        <a name="archive" class="btn btn-success btn-sm" title="В архив"><i class="fa fa-reply"></i></a>
+                    }
+                    else if (doc.DocStateSysName.Equals("ARCHIVE"))
+                    {
+                        <a class="btn btn-warning btn-sm" title="Выдать"><i class="fa fa-backward"></i></a>
+                    }
+                </td>
+            </tr>*@
     }
 </table>
+@*<div class="row">
+        <div class="col-lg-12">
+            <div class="pull-left">
+                <nav>
+                    <ul class="pagination nomargin pages">
+                        @for (int i = 1; i <= pageCount + 1; i++)
+                        {
+                            <li name="page" class="@(i==currPage? "active" : String.Empty)"><a href="@Url.Current(new {page=i})">@i</a></li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+            <div class="pull-right">
+                <nav>
+                    <ul class="pagination pagesize nomargin">
+                        <li><a name="pageSize" value="30" href="@Url.Current(new { topRows=30})" class="btn btn-default btn-sm selected">30</a></li>
+                        <li><a name="pageSize" value="100" href="@Url.Current(new { topRows=100})" class="btn btn-default btn-sm">100</a></li>
+                        <li><a name="pageSize" value="300" href="@Url.Current(new { topRows=300})" class="btn btn-default btn-sm">300</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>*@
+
+<div id="outModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Укажите сотрудника</h4>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <div class="input-group-btn" style="width: 150px;">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="поиск" id="empSearch" />
+                            <div class="input-group-btn">
+                                <a href="#!"><i class="fa fa-search"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <select id="employeeOut" class="form-control required-mark"></select>
+                </div>
+                @*@Html.DropDownList("EmployeeOut", new SelectList(Employee.GetOutSelectionList()), "--выберите сотрудника--")*@
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-remove"></i>Отмена</button>
+                <a id="outSave" class="btn btn-success"><i class="fa fa-save"></i>Выдать</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="placeModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Укажите местоположение</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="col-lg-3 control-label no-pad-top">Местоположение</label>
+                    <div class="col-lg-3">
+                        <input class="form-control required-mark" id="stack" required="required" placeholder="Стеллаж" />
+                    </div>
+                    <div class="col-lg-3">
+                        <input class="form-control required-mark" id="shelf" required="required" placeholder="Полка" />
+                    </div>
+                    <div class="col-lg-3">
+                        <input class="form-control required-mark" id="folder" required="required" placeholder="Папка" />
+                    </div>
+                    @*<div class="col-lg-4">
+                            <table class="table table-bordered">
+                                <tr>
+                                    <td>Шкаф</td>
+                                    <td>
+                                        <input class="form-control required-mark" id="stack" required="required" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Полка</td>
+                                    <td>
+                                        <input class="form-control required-mark" id="shelf" required="required" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Папка</td>
+                                    <td>
+                                        <input class="form-control required-mark" id="folder" required="required" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>*@
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-remove"></i>Отмена</button>
+                <a id="archiveSave" class="btn btn-success"><i class="fa fa-save"></i>В ахрив</a>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section scripts
 {
     <script type="text/javascript">
         $(function () {
-            $()
+            $('#docNumber').keypress(
+                function (e) {
+                    if (e.keyCode != 13) return;
+                    search();
+                });
+            $('#docDate').keypress(
+                function (e) {
+                    if (e.keyCode != 13) return;
+                    search();
+                });
+            $('#docType').keypress(
+                function (e) {
+                    if (e.keyCode != 13) return;
+                    search();
+                });
+            //$('#dateCreate').keypress(
+            //    function(e) {
+            //        if (e.keyCode != 13) return;
+            //        search();
+            //    });
+            $('#state').keypress(
+                function (e) {
+                    if (e.keyCode != 13) return;
+                    search();
+                });
+            $('#place').keypress(
+                function (e) {
+                    if (e.keyCode != 13) return;
+                    search();
+                });
+            $('#idDoc').keypress(
+                function (e) {
+                    if (e.keyCode != 13) return;
+                    search();
+                });
+            $('#contractor').keypress(
+                function (e) {
+                    if (e.keyCode != 13) return;
+                    search();
+                });
+            tableBtnsInit($('#docList'));
+            $('#outSave').click(function () {
+                var idDoc = $('#outModal').attr('idDoc');
+                $('#outModal').removeAttr('idDoc');
+                var $select = $('#employeeOut');
+                var whoGetSid = $select.val();
 
-            $('tr.doc-row').click(function() {
-                var id = $(this).attr('id');
-                window.open('@Url.Action("Edit")?id=' + id);
+                if (whoGetSid == '') {
+                    alert('Выберите сотрудника!');
+                    return;
+                }
+                $.ajax({
+                    url: '@Url.Action("SetOutState")',
+                    method: 'POST',
+                    data: { id: idDoc, whoGetSid: whoGetSid },
+                    success: function () {
+                        $.ajax({
+                            url: '@Url.Action("GetDocumentListItem")?id=' + idDoc,
+                            method: 'GET',
+                            success: function (html) {
+                                $('#outModal').modal('hide');
+                                var $row = $('tr.doc-row#' + idDoc);
+                                $row.replaceWith(html);
+                                $row = $('tr.doc-row#' + idDoc);
+                                $row.addClass('updated-row');
+                                tableBtnsInit($row);
+                            },
+                            error: function (xhr, ajaxOptions, thrownError) {
+                                alert(xhr.responseText);
+                            }
+                        });
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert(xhr.responseText);
+                    }
+                });
             });
+            $('#archiveSave').click(function () {
+                var idDoc = $('#placeModal').attr('idDoc');
+                $('#placeModal').removeAttr('idDoc');
+                var stack = $('#stack').val();
+                var shelf = $('#shelf').val();
+                var folder = $('#folder').val();
+                $.ajax({
+                    url: '@Url.Action("SetArchiveState")',
+                    method: 'POST',
+                    data: { id: idDoc, stack: stack, shelf: shelf, folder: folder },
+                    success: function (data) {
+                        $.ajax({
+                            url: '@Url.Action("GetDocumentListItem")?id=' + idDoc,
+                            method: 'GET',
+                            success: function (html) {
+                                $('#placeModal').modal('hide');
+                                var $row = $('tr.doc-row#' + idDoc);
+                                $row.replaceWith(html);
+                                $row = $('tr.doc-row#' + idDoc);
+                                $row.addClass('updated-row');
+                                tableBtnsInit($row);
+                            },
+                            error: function (xhr, ajaxOptions, thrownError) {
+                                alert(xhr.responseText);
+                            }
+                        });
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert(xhr.responseText);
+                    }
+                });
+            });
+            $('#empSearch').keypress(function (e) {
+                if (e.which !== 13) return;
+                empSearch(e);
+            });
+            $('#empSearch').on('input', empSearch);
         });
+
+        function empSearch(e) {
+            var emp = $('#empSearch').val();
+            var $select = $('#employeeOut');
+            $select.find('option').remove();
+            if (emp.length > 3) {
+                $.ajax({
+                    url: "@Url.Action("GetOutEmployeesList")",
+                    data: { name: emp },
+                    method: 'POST',
+                    success: function (data) {
+                        //$select.append('<option>--выберите сотрудника--</option>');
+                        $select.find('option').remove();
+                        if (data.length > 0) {
+                            for (var i = 0; i <= data.length; i++) {
+                                var item = data[i];
+                                var opt = '<option value="' + item.Key + '">' + item.Value + '</option>';
+                                $select.append(opt);
+                            }
+                        } else {
+                            $select.append('<option value=>ничего не найдено</option>');
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert(xhr.responseText);
+                    }
+
+                });
+            }
+        }
+
+        function tableBtnsInit($container) {
+            $('[name="archive"]', $container).click(function (e) {
+                e.stopPropagation();
+                var $row = $(this).closest('tr.doc-row');
+                var idDoc = $row.attr('id');
+                if ($row.attr('noplace') != undefined) {
+                    $('#placeModal').modal();
+                    $('#stack').val('');
+                    $('#shelf').val('');
+                    $('#folder').val('');
+                    $('#placeModal').attr('idDoc', idDoc);
+                } else {
+                    $.ajax({
+                        url: '@Url.Action("SetArchiveState")',
+                        method: 'POST',
+                        data: { id: idDoc },
+                        success: function (data) {
+                            $.ajax({
+                                url: '@Url.Action("GetDocumentListItem")?id=' + idDoc,
+                                method: 'GET',
+                                success: function (html) {
+                                    $('#placeModal').modal('hide');
+                                    var $row = $('tr.doc-row#' + idDoc);
+                                    $row.replaceWith(html);
+                                    $row = $('tr.doc-row#' + idDoc);
+                                    $row.addClass('updated-row');
+                                    tableBtnsInit($row);
+                                },
+                                error: function (xhr, ajaxOptions, thrownError) {
+                                    alert(xhr.responseText);
+                                }
+                            });
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert(xhr.responseText);
+                        }
+                    });
+                }
+            });
+            $('[name="out"]', $container).click(function (e) {
+                e.stopPropagation();
+                var $row = $(this).closest('tr.doc-row');
+                var idDoc = $row.attr('id');
+                $('#outModal').modal();
+                $('#outModal').attr('idDoc', idDoc);
+                var $select = $('#employeeOut');
+                $('#empSearch').val('');
+                $select.find('option').remove();
+                if ($select.find('option').length < 1) {
+                    $.ajax({
+                        url: "@Url.Action("GetOutEmployeesList")",
+                        method: 'POST',
+                        success: function (data) {
+                            $select.append('<option>--выберите сотрудника--</option>');
+                            for (var i = 0; i <= data.length; i++) {
+                                var item = data[i];
+                                var opt = '<option value="' + item.Key + '">' + item.Value + '</option>';
+                                $select.append(opt);
+                            }
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert(xhr.responseText);
+                        }
+                    });
+                }
+            });
+            $('[name="fileLink"]').click(function (e) {
+                e.stopPropagation();
+            });
+
+            if ($container == null || $container.find('tr.doc-row').length > 0) {
+                $('tr.doc-row').click(function (e) {
+                    var id = $(this).attr('id');
+                    @*window.open('@Url.Action("Card")?id=' + id);*@
+                    window.location = '@Url.Action("Card")?id=' + id;
+                });
+            } else {
+                if ($($container).hasClass('doc-row')) {
+                    $($container).click(function (e) {
+                        var id = $(this).attr('id');
+                        @*window.open('@Url.Action("Card")?id=' + id);*@
+                        window.location = '@Url.Action("Card")?id=' + id;
+                    });
+                }
+            }
+        }
+
+        function search() {
+            var curUrl = '@Request.RawUrl';
+            var url = curUrl;
+            //alert(url);
+            var docNum = $('#docNumber').val();
+            url = updateQueryStringParameter(url, 'docNum', docNum);
+            var docDate = $('#docDate').val();
+            url = updateQueryStringParameter(url, 'docDate', docDate);
+            var docType = $('#docType').val();
+            url = updateQueryStringParameter(url, 'docType', docType);
+            //var dateCreate = $('#dateCreate').val();
+            //url = updateQueryStringParameter(url, 'dateCreate', dateCreate);
+            var state = $('#state').val();
+            if (state == undefined) state = '';
+            url = updateQueryStringParameter(url, 'state', state);
+            var place = $('#place').val();
+            if (place == undefined) place = '';
+            url = updateQueryStringParameter(url, 'place', place);
+            var idDoc = $('#idDoc').val();
+            url = updateQueryStringParameter(url, 'idDoc', idDoc);
+            var contractor = $('#contractor').val();
+            url = updateQueryStringParameter(url, 'contractor', contractor);
+
+            window.location = url;
+        }
+
+        function updateQueryStringParameter(uri, key, value) {
+            var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+            var separator = uri.indexOf('?') !== -1 ? "&" : "?";
+            if (uri.match(re)) {
+                return uri.replace(re, '$1' + key + "=" + value + '$2');
+            } else {
+                return uri + separator + key + "=" + value;
+            }
+        }
+        @*function fillPager() {
+            var topRows = @(Request.QueryString["topRows"] ?? "30");
+            var totalCount = @ViewBag.TotalCount;
+            var selPage = @(Request.QueryString["page"] ?? "1");
+
+            var pages = Math.floor(totalCount / topRows);
+            if ((totalCount % topRows) > 0) pages++;
+            $('.pagination.pages li').remove();
+            for (var i = 0; i < pages; i++) {
+
+                var btn = '<li name="page" value="' + (i + 1) + '" class="' + (selPage == i + 1 ? 'active' : '') + '"><a value="' + (i + 1) + '" href="#!">' + (i + 1) + '</a></li>';
+                $('.pagination.pages').append(btn);
+            }
+            $('[name="page"] a').click(function () {
+                $('[name="page"].active').removeClass('active');
+                $('[name="page"][value="' + $(this).attr('value') + '"]').addClass('active');
+                window.location =
+            });
+        }*@
     </script>
 }
