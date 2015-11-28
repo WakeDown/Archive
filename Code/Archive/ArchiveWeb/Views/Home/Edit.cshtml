@@ -72,7 +72,7 @@
                 <div class="col-lg-2">
                     @if (String.IsNullOrEmpty(Model.FileName))
                     {
-                        <input type="file" name="file" />
+                        <input type="file" name="file"/>
                     }
                     else
                     {
@@ -85,6 +85,16 @@
                 </div>
             </div>
             <div class="form-group">
+                <label class="col-lg-2 control-label no-pad-top">Местоположение</label>
+                <div class="col-lg-4">
+                    <table class="table table-bordered">
+                        <tr><td>Стеллаж</td><td>@(Model.Place.StackNumber ?? "неизвестно")</td></tr>
+                        <tr><td>Полка</td><td>@(Model.Place.ShelfNumber <= 0 ? "неизвестно" : Model.Place.ShelfNumber.ToString())</td></tr>
+                        <tr><td>Папка</td><td>@(Model.Place.FolderNumber <= 0 ? "неизвестно" : Model.Place.FolderNumber.ToString())</td></tr>
+                    </table>
+                </div>
+            </div>
+            @*<div class="form-group">
                 <label class="col-lg-2 control-label no-pad-top">Местоположение</label>
                 <div class="col-lg-4">
                     <table class="table table-bordered">
@@ -108,7 +118,7 @@
                         </tr>
                     </table>
                 </div>
-            </div>
+            </div>*@
             <div class="form-group">
                 <div class="col-lg-push-2 col-lg-8">
                     @*<a type="submit" class="btn btn-primary btn-sm" href="#"><i class="fa fa-save"></i>&nbsp;добавить</a>*@

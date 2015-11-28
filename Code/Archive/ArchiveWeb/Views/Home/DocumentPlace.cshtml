@@ -1,0 +1,70 @@
+﻿@model ArchiveWeb.Models.Document
+
+@{
+    ViewBag.Title = "Месторасположение документа";
+    Layout = "~/Views/Shared/_Editor.cshtml";
+}
+
+@section PanelHead
+{
+    Месторасположение для документа @Model.DocType №@Model.DocNumber от @Model.DocDate.ToString("dd.MM.yyyy")
+}
+
+
+@section PanelBody
+{
+    
+        <div class="form-horizontal">
+            @*<div class="form-group">
+            <div class="col-lg-push-2 col-lg-5">
+                <div class="row">
+                    <div class="col-lg-3">
+                        Стеллаж №@Model.Place.StackNumber
+                    </div>
+                    <div class="col-lg-3">
+                        Полка №@Model.Place.ShelfNumber
+                        <div>
+                            <small>полки считаются сверху вниз</small>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        Папка №@Model.Place.FolderNumber
+                        <div>
+                            <small>папки раскладываются слева направо</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>*@
+            <div class="form-group">
+                <label class="col-lg-2 control-label no-pad-top">Стеллаж №</label>
+                <div class="col-lg-4">
+                    @Model.Place.StackNumber
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label no-pad-top">Полка №</label>
+                <div class="col-lg-4">
+                    @Model.Place.ShelfNumber
+                    <div>
+                        <small>полки считаются сверху вниз</small>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label no-pad-top">Папка №</label>
+                <div class="col-lg-4">
+                    @Model.Place.FolderNumber
+                    <div>
+                        <small>папки раскладываются слева направо</small>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-lg-push-2 col-lg-5">
+                    <a id="btnContinue" class="btn btn-primary" href="@Url.Action("Index", "Home")"><i class="fa fa-mail-forward"></i>&nbsp;вернуться к списку</a>
+                </div>
+            </div>
+        </div>
+    
+}

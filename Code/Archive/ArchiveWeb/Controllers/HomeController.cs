@@ -7,6 +7,7 @@ using System.Web;
 using System.Web.Mvc;
 using ArchiveWeb.Models;
 using ArchiveWeb.Objects;
+using ClosedXML.Excel;
 
 namespace ArchiveWeb.Controllers
 {
@@ -61,6 +62,10 @@ namespace ArchiveWeb.Controllers
                 int id = model.Add(CurUser.Sid);
                 //if (!complete) throw new Exception(responseMessage.ErrorMessage);
                 //return RedirectToAction("Edit", "Document", new { id = id });
+
+                
+                return RedirectToAction("DocumentPlace",new { id=id });
+
                 if (!String.IsNullOrEmpty(Request.Form["CreateAndClose"]))
                 {
                     return RedirectToAction("Index");
@@ -81,6 +86,14 @@ namespace ArchiveWeb.Controllers
                 return View("Add", model);
             }
         }
+
+        public ActionResult DocumentPlace(int? id)
+        {
+            if (!id.HasValue) return HttpNotFound();
+            var doc = new Document(id.Value);
+            return View(doc);
+        }
+
         [HttpGet]
         public ActionResult Card(int? id)
         {
@@ -215,6 +228,90 @@ namespace ArchiveWeb.Controllers
         {
             Document.Delete(id, CurUser.Sid);
             return Json(new {});
+        }
+
+        public ActionResult GetDocumentListBackup()
+        {
+            if (!CurUser.HasAccess(AdGroup.ArchiveAddDoc)) return RedirectToAction("AccessDenied", "Error");
+
+            var list = Document.GetListBackup();
+            var data = DocumentList2Excel(list);
+
+            return File(data, "application/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Архив документов - резервная копия .xlsx");
+        }
+
+        public byte[] DocumentList2Excel(IEnumerable<Document> list)
+        {
+            XLWorkbook wb = new XLWorkbook();
+            IXLWorksheet sheet = wb.AddWorksheet("Документы в архиве");
+            const int startCol = 1;
+            const int startRow = 1;
+            int row = startRow;
+            int col = startCol;
+
+            //Заголовок
+            sheet.Cell(row, col).Value = "ID";
+            sheet.Cell(row, ++col).Value = "Контрагент";
+            sheet.Cell(row, ++col).Value = "Юр. лицо Юнит";
+            sheet.Cell(row, ++col).Value = "Тип документа";
+            sheet.Cell(row, ++col).Value = "№ документа";
+            sheet.Cell(row, ++col).Value = "Дата документа";
+            sheet.Cell(row, ++col).Value = "Листов";
+            sheet.Cell(row, ++col).Value = "Стеллаж";
+            sheet.Cell(row, ++col).Value = "Полка";
+            sheet.Cell(row, ++col).Value = "Папка";
+            sheet.Cell(row, ++col).Value = "Дата приема";
+            sheet.Cell(row, ++col).Value = "Приял";
+            sheet.Cell(row, ++col).Value = "Статус";
+            sheet.Cell(row, ++col).Value = "Дата изменения статуса";
+            sheet.Cell(row, ++col).Value = "Изменил статус";
+            sheet.Cell(row, ++col).Value = "Выдано";
+            // />Заголовок
+            int lastCol = col;
+
+            var header = sheet.Range(sheet.Cell(row, startCol), sheet.Cell(row, lastCol));
+            header.Style.Font.SetBold();
+
+            foreach (Document doc in list)
+            {
+                row++;
+                col = startCol;
+
+                sheet.Cell(row, col).Value = doc.Id;
+                sheet.Cell(row, ++col).Value = doc.ContractorName;
+                sheet.Cell(row, ++col).Value = doc.Organization;
+                sheet.Cell(row, ++col).Value = doc.DocType;
+                sheet.Cell(row, ++col).Value = doc.DocNumber;
+                sheet.Cell(row, ++col).Value = doc.DocDate;
+                sheet.Cell(row, ++col).Value = doc.SheetCount;
+                sheet.Cell(row, ++col).Value = doc.Place.StackNumber;
+                sheet.Cell(row, ++col).Value = doc.Place.ShelfNumber;
+                sheet.Cell(row, ++col).Value = doc.Place.FolderNumber;
+                sheet.Cell(row, ++col).Value = doc.DateCreate;
+                sheet.Cell(row, ++col).Value = doc.CreatorName;
+                sheet.Cell(row, ++col).Value = doc.State;
+                sheet.Cell(row, ++col).Value = doc.DateStateChange;
+                sheet.Cell(row, ++col).Value = doc.StateChangerName;
+                sheet.Cell(row, ++col).Value = doc.WhoGetName;
+            }
+
+            var all = sheet.Range(sheet.Cell(startRow, startCol), sheet.Cell(row, lastCol));
+            all.Style.Font.SetFontSize(10);
+            all.CreateTable();
+
+            all.Style.Border.SetBottomBorder(XLBorderStyleValues.Thin);
+            all.Style.Border.SetBottomBorderColor(XLColor.Gray);
+            all.Style.Border.SetTopBorder(XLBorderStyleValues.Thin);
+            all.Style.Border.SetTopBorderColor(XLColor.Gray);
+            all.Style.Border.SetRightBorder(XLBorderStyleValues.Thin);
+            all.Style.Border.SetRightBorderColor(XLColor.Gray);
+            all.Style.Border.SetLeftBorder(XLBorderStyleValues.Thin);
+            all.Style.Border.SetLeftBorderColor(XLColor.Gray);
+
+            var ms = new MemoryStream();
+            wb.SaveAs(ms);
+            ms.Seek(0, SeekOrigin.Begin);
+            return ms.ToArray();
         }
     }
 }

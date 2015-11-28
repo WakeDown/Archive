@@ -1,6 +1,6 @@
 ﻿@model ArchiveWeb.Models.Document
     
-<tr class="doc-row" id="@Model.Id" @(String.IsNullOrEmpty(Model.Stack) && String.IsNullOrEmpty(Model.Shelf) && String.IsNullOrEmpty(Model.Folder) ? "noplace=noplace" : String.Empty)>
+<tr class="doc-row" id="@Model.Id">
     <th>@Model.Id</th>
     <td>@Model.DocNumber</td>
     <td>@Model.DocDate.ToString("dd.MM.yyyy")</td>
@@ -36,11 +36,11 @@
 @if (ViewBag.PlaceView != null && ViewBag.PlaceView)
 {
     <td>
-        <div><small>Стеллаж - @(Model.Stack ?? "неизвестно")</small>
+        <div><small>Стеллаж - @(Model.Place.StackNumber ?? "неизвестно")</small>
         </div>
-        <div><small>Полка - @(Model.Shelf ?? "неизвестно")</small>
+        <div><small>Полка - @(Model.Place.ShelfNumber ==0? "неизвестно": Model.Place.ShelfNumber.ToString())</small>
         </div>
-        <div><small>Папка - @(Model.Folder ?? "неизвестно")</small>
+        <div><small>Папка - @(Model.Place.FolderNumber==0 ? "неизвестно": Model.Place.FolderNumber.ToString())</small>
         </div>
     </td>
 }

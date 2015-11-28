@@ -27,6 +27,8 @@ namespace ArchiveWeb.Models
         public DateTime DateCreate { get; set; }
         public int SheetCount { get; set; }
         
+        public Place Place { get; set; }
+
 
         /// <summary>
         /// Стеллаж
@@ -92,6 +94,8 @@ namespace ArchiveWeb.Models
             FileName = Db.DbHelper.GetValueString(row, "file_name");
             FileSid = Db.DbHelper.GetValueString(row, "file_sid");
             Enabled = Db.DbHelper.GetValueBool(row, "enabled");
+
+            Place = new Place() {StackNumber = Db.DbHelper.GetValueString(row, "place_stack"),ShelfNumber = Db.DbHelper.GetValueIntOrDefault(row, "place_shelf"), FolderNumber = Db.DbHelper.GetValueIntOrDefault(row, "place_folder") };
         }
 
         public static IEnumerable<Document> GetList(out int totalCount, int? topRows = null, int? pageNum = null, string docNum = null, string docDate=null, string docType = null, string dateCreate = null, string state = null, string place = null, string id = null, string contractor = null)
@@ -128,8 +132,31 @@ namespace ArchiveWeb.Models
             //return result;
         }
 
+        public static IEnumerable<Document> GetListBackup()
+        {
+            var dt = Db.Archive.ExecuteQueryStoredProcedure("document_get_list_backup");
+
+            
+            var lst = new List<Document>();
+
+            if (dt.Rows.Count > 0)
+            {
+                foreach (DataRow row in dt.Rows)
+                {
+                    var model = new Document(row);
+                    lst.Add(model);
+                }
+            }
+            return lst;
+        }
+
         public int Add(string creatorSid)
         {
+            if (SheetCount > 500)
+            {
+                throw new ArgumentException("Нельзя добавить докумнет больше 500 листов. Обратитесь к администратору системы! Документ не был сохранен!");
+            }
+
             SqlParameter pDocDate = new SqlParameter() { ParameterName = "doc_date", SqlValue = DocDate, SqlDbType = SqlDbType.DateTime };
             SqlParameter pDocNumber = new SqlParameter() { ParameterName = "doc_number", SqlValue = DocNumber, SqlDbType = SqlDbType.NVarChar };
             SqlParameter pSheetCount = new SqlParameter() { ParameterName = "sheet_count", SqlValue = SheetCount, SqlDbType = SqlDbType.Int };
@@ -143,15 +170,18 @@ namespace ArchiveWeb.Models
             SqlParameter pFile = new SqlParameter() { ParameterName = "file", SqlValue = FileData, SqlDbType = SqlDbType.VarBinary };
             SqlParameter pFileName = new SqlParameter() { ParameterName = "file_name", SqlValue = FileName, SqlDbType = SqlDbType.VarChar };
 
-            var dt = Db.Archive.ExecuteQueryStoredProcedure("document_add", pDocDate, pDocNumber, pSheetCount, pIdOrganization, pIdDocType, pIdDocState, pCreatorAdSid, pIdContractor, pContractor, pOrganization
-                , pFile, pFileName
-                );
+            var dt = Db.Archive.ExecuteQueryStoredProcedure("document_add", pDocDate, pDocNumber, pSheetCount, pIdOrganization, pIdDocType, pIdDocState, pCreatorAdSid, pIdContractor, pContractor, pOrganization, pFile, pFileName);
             int id = 0;
             if (dt.Rows.Count > 0)
             {
                 int.TryParse(dt.Rows[0]["id"].ToString(), out id);
                 Id = id;
             }
+
+            int idPlace = Place.GetNew(Id);
+            Place.Fill(idPlace, Id, creatorSid);
+            SetArchiveState(Id, creatorSid);
+
             return id;
         }
 

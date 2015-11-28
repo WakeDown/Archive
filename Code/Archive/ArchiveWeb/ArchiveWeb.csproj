@@ -40,6 +40,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ClosedXML, Version=0.76.0.0, Culture=neutral, PublicKeyToken=fd1eb21b62ae805b, processorArchitecture=MSIL">
+      <HintPath>..\packages\ClosedXML.0.76.0\lib\net40-client\ClosedXML.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\DocumentFormat.OpenXml.2.5\lib\DocumentFormat.OpenXml.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -121,6 +129,7 @@
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PlaceController.cs" />
+    <Compile Include="Controllers\StakeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -136,6 +145,7 @@
     <Compile Include="Models\Organization.cs" />
     <Compile Include="Models\AdUser.cs" />
     <Compile Include="Models\Place.cs" />
+    <Compile Include="Models\Stake.cs" />
     <Compile Include="Objects\AdGroup.cs" />
     <Compile Include="Objects\AdUserGroup.cs" />
     <Compile Include="Objects\BaseController.cs" />
@@ -251,6 +261,9 @@
     <Content Include="Views\Home\DocumentListItem.cshtml" />
     <Content Include="Views\Shared\WindowClose.cshtml" />
     <Content Include="Views\Place\Index.cshtml" />
+    <Content Include="Views\Stake\Index.cshtml" />
+    <Content Include="Views\Stake\Create.cshtml" />
+    <Content Include="Views\Home\DocumentPlace.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

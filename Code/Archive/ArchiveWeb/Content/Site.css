@@ -150,6 +150,17 @@ input[type="checkbox"].input-validation-error {
   border-color: #d58512 !important;
 }
 
+.nav-btn-success {
+    color: #fff !important;
+  background-color: #5cb85c !important;   
+}
+
+.nav-btn-success:hover {
+    color: #fff !important;
+  background-color: #449d44 !important;
+  border-color: #4cae4c !important;
+}
+
 input.required-mark, select.required-mark, span.required-mark, textarea.required-mark {
     background-color: #F7F1D4;
 }
@@ -200,4 +211,14 @@ tr.doc-row:hover {
 .min-width{
     min-width: 1px;
     width: 1px;
+}
+
+.text-bold {
+    font-weight: 700;
+}
+.no-marg {
+    margin: 0 !important;
+}
+.pad-l-sm {
+    padding-left: 5px;
 }

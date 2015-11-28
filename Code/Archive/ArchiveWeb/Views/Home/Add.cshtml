@@ -99,8 +99,9 @@
             <div class="col-lg-push-2 col-lg-5">
                 @*<a type="submit" class="btn btn-primary btn-sm" href="#"><i class="fa fa-save"></i>&nbsp;добавить</a>*@
                 <a class="btn btn-primary btn-sm" href="@Url.Action("Index")">Назад</a>
-                <button id="btnCreateAndClose" type="submit" class="btn btn-success" name="CreateAndClose" value="CreateAndClose"><i class="fa fa-save"></i>&nbsp;Сохранить и закрыть</button>
-                <button id="btnCreateAndContinue" type="submit" class="btn btn-success" name="CreateAndContinue" value="CreateAndContinue"><i class="fa fa-save"></i>&nbsp;Сохранить и продолжить</button>
+                <button id="btnCreateAndFill" type="submit" class="btn btn-success" name="CreateAndFill" value="CreateAndFill"><i class="fa fa-save"></i>&nbsp;Сохранить и положить</button>
+                @*<button id="btnCreateAndClose" type="submit" class="btn btn-success" name="CreateAndClose" value="CreateAndClose"><i class="fa fa-save"></i>&nbsp;Сохранить и закрыть</button>
+                <button id="btnCreateAndContinue" type="submit" class="btn btn-success" name="CreateAndContinue" value="CreateAndContinue"><i class="fa fa-save"></i>&nbsp;Сохранить и продолжить</button>*@
             </div>
         </div>
         if (TempData["error"] != null)

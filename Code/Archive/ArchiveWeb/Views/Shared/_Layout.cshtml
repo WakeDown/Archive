@@ -31,16 +31,24 @@
                     @if (ViewBag.CurUser.HasAccess(AdGroup.ArchiveAddDoc))
                     {
                         <li>
-                            <a href='@Url.Action("Add", "Home")' class="nav-btn-primary" target="_blank">
-                                <i class="fa fa-plus"></i> Прием документа
+                            <a href='@Url.Action("Add", "Home")' class="nav-btn-primary">
+                                <i class="fa fa-file-archive-o"></i> Прием документа
                             </a>
                         </li>
                     }
 @if (ViewBag.CurUser.HasAccess(AdGroup.ArchiveCreateClaim))
 {
     <li>
-        <a href='@Url.Action("RequestDoc", "Home")' class="nav-btn-warning" target="_blank">
-            <i class="fa fa-plus"></i> Новый запрос
+        <a href='@Url.Action("RequestDoc", "Home")' class="nav-btn-warning">
+            <i class="fa fa-comment-o"></i> Новый запрос
+        </a>
+    </li>
+}
+@if (ViewBag.CurUser.HasAccess(AdGroup.ArchivePlacesEditor))
+{
+    <li>
+        <a href='@Url.Action("Index", "Stake")' class="nav-btn-success">
+            <i class="fa fa-folder-open-o"></i> Места хранения
         </a>
     </li>
 }

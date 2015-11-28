@@ -46,10 +46,10 @@
         </div>
     </div>*@
 <div class="row">
-    <div class="col-lg-3 col-sm-12 col-xs-12 hidden-sm hidden-xs">
+    <div class="col-lg-5 col-sm-12 col-xs-12 hidden-sm hidden-xs">
         <div class="pull-left">
             <nav>
-                <ul class="pagination nomargin pages">
+                <ul class="pagination no-marg pages">
 
                     <li name="page" class="@(currPage == 1 ? "disabled" : String.Empty)"><a href="@Url.Current(new {page = Convert.ToInt32(Request.QueryString["page"]) - 1})"><</a></li>
 
@@ -72,15 +72,21 @@
                 </ul>
             </nav>
         </div>
+        <div class="pull-left pad-l-sm">
+            @if (ViewBag.PlaceView != null && ViewBag.PlaceView)
+            {
+                <a href="@Url.Action("GetDocumentListBackup")" class="btn btn-primary"><i class="fa fa-file-excel-o"></i> резервная копия</a>
+            }
+        </div>
     </div>
-    <div class="col-lg-7 col-sm-12 col-xs-12">
-        <div id="stateFilter"></div>
+    <div class="col-lg-5 col-sm-12 col-xs-12">
+
     </div>
     <div class="col-lg-2 col-sm-6 col-xs-6">
         <div>
             <div class="text-right">
                 <nav>
-                    <ul class="pagination pagesize nomargin">
+                    <ul class="pagination pagesize no-marg">
                         <li><a name="pageSize" value="30" href="@Url.Current(new { topRows=30, page=1})" class="btn btn-default btn-sm selected">30</a></li>
                         <li><a name="pageSize" value="100" href="@Url.Current(new { topRows=100, page=1})" class="btn btn-default btn-sm">100</a></li>
                         <li><a name="pageSize" value="300" href="@Url.Current(new { topRows=300, page=1})" class="btn btn-default btn-sm">300</a></li>
@@ -214,11 +220,12 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Укажите местоположение</h4>
+                <h4 class="modal-title">Возврат документа</h4>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label class="col-lg-3 control-label no-pad-top">Местоположение</label>
+                    Подтвердите возврат документа в архив
+                    @*<label class="col-lg-3 control-label no-pad-top">Местоположение</label>
                     <div class="col-lg-3">
                         <input class="form-control required-mark" id="stack" required="required" placeholder="Стеллаж" />
                     </div>
@@ -227,7 +234,7 @@
                     </div>
                     <div class="col-lg-3">
                         <input class="form-control required-mark" id="folder" required="required" placeholder="Папка" />
-                    </div>
+                    </div>*@
                     @*<div class="col-lg-4">
                             <table class="table table-bordered">
                                 <tr>
@@ -344,9 +351,9 @@
             $('#archiveSave').click(function () {
                 var idDoc = $('#placeModal').attr('idDoc');
                 $('#placeModal').removeAttr('idDoc');
-                var stack = $('#stack').val();
-                var shelf = $('#shelf').val();
-                var folder = $('#folder').val();
+                var stack = null; //$('#stack').val();
+                var shelf = null; //$('#shelf').val();
+                var folder = null; //$('#folder').val();
                 $.ajax({
                     url: '@Url.Action("SetArchiveState")',
                     method: 'POST',
