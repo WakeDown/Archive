@@ -11,7 +11,7 @@ namespace ArchiveWeb.Objects
         SuperAdmin,
         SystemUser,
         ArchiveAddDoc,
-        ArchiveCreateClaim,
+        ArchiveCreateRequest,
         ArchiveDeleteFile,
         ArchiveDeleteRecord,
         ArchivePlacesEditor

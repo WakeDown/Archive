@@ -171,18 +171,25 @@ namespace ArchiveWeb.Models
             SqlParameter pFileName = new SqlParameter() { ParameterName = "file_name", SqlValue = FileName, SqlDbType = SqlDbType.VarChar };
 
             var dt = Db.Archive.ExecuteQueryStoredProcedure("document_add", pDocDate, pDocNumber, pSheetCount, pIdOrganization, pIdDocType, pIdDocState, pCreatorAdSid, pIdContractor, pContractor, pOrganization, pFile, pFileName);
-            int id = 0;
+            
             if (dt.Rows.Count > 0)
             {
-                int.TryParse(dt.Rows[0]["id"].ToString(), out id);
-                Id = id;
+                Id = Db.DbHelper.GetValueIntOrDefault(dt.Rows[0], "id");
+                bool alredyExists = Db.DbHelper.GetValueBool(dt.Rows[0], "exists");
+                if (alredyExists) return -999;
+                else if (Id > 0)
+                {
+                    int idPlace = Place.GetNew(Id);
+                    Place.Fill(idPlace, Id, creatorSid);
+                    SetArchiveState(Id, creatorSid);
+                }
+
+
             }
 
-            int idPlace = Place.GetNew(Id);
-            Place.Fill(idPlace, Id, creatorSid);
-            SetArchiveState(Id, creatorSid);
+            
 
-            return id;
+            return Id;
         }
 
         public void Update(string creatorSid)

@@ -36,14 +36,14 @@
                             </a>
                         </li>
                     }
-@if (ViewBag.CurUser.HasAccess(AdGroup.ArchiveCreateClaim))
+@*@if (ViewBag.CurUser.HasAccess(AdGroup.ArchiveCreateClaim))
 {
     <li>
         <a href='@Url.Action("RequestDoc", "Home")' class="nav-btn-warning">
             <i class="fa fa-comment-o"></i> Новый запрос
         </a>
     </li>
-}
+}*@
 @if (ViewBag.CurUser.HasAccess(AdGroup.ArchivePlacesEditor))
 {
     <li>

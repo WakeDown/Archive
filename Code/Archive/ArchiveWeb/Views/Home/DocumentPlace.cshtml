@@ -36,6 +36,14 @@
                 </div>
             </div>
         </div>*@
+            @if (ViewBag.Exists != null && ViewBag.Exists)
+            {
+                <div class="form-group">
+                    <div class="col-lg-push-2 col-lg-5">
+                        <blockquote class="alert-warning">Документ уже существует в записях архива!</blockquote>
+                    </div>
+                </div>
+            }
             <div class="form-group">
                 <label class="col-lg-2 control-label no-pad-top">Стеллаж №</label>
                 <div class="col-lg-4">

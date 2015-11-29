@@ -21,6 +21,7 @@ namespace ArchiveWeb.Controllers
             var lst = Document.GetList(out totalCount, topRows, page, docNum, docDate, docType, dateCreate, state, place, idDoc, contractor);
             ViewBag.TotalCount = totalCount;
             ViewBag.PlaceView = CurUser.HasAccess(AdGroup.ArchiveAddDoc);
+            ViewBag.RequestCreate = CurUser.HasAccess(AdGroup.ArchiveCreateRequest);
             return View(lst);
         }
 
@@ -59,12 +60,12 @@ namespace ArchiveWeb.Controllers
                     model.FileData = fileData;
                     model.FileName = file.FileName;
                 }
-                int id = model.Add(CurUser.Sid);
+                int retCode = model.Add(CurUser.Sid);
                 //if (!complete) throw new Exception(responseMessage.ErrorMessage);
                 //return RedirectToAction("Edit", "Document", new { id = id });
 
                 
-                return RedirectToAction("DocumentPlace",new { id=id });
+                return RedirectToAction("DocumentPlace",new { id= model.Id, exists= retCode==-999 });
 
                 if (!String.IsNullOrEmpty(Request.Form["CreateAndClose"]))
                 {
@@ -73,7 +74,7 @@ namespace ArchiveWeb.Controllers
                 }
                 else if (!String.IsNullOrEmpty(Request.Form["CreateAndContinue"]))
                 {
-                    return RedirectToAction("Edit", new {id = id});
+                    return RedirectToAction("Edit", new {id = model.Id });
                 }
                 else
                 {
@@ -87,10 +88,11 @@ namespace ArchiveWeb.Controllers
             }
         }
 
-        public ActionResult DocumentPlace(int? id)
+        public ActionResult DocumentPlace(int? id, bool? exists)
         {
             if (!id.HasValue) return HttpNotFound();
             var doc = new Document(id.Value);
+            ViewBag.Exists = exists;
             return View(doc);
         }
 
@@ -237,7 +239,7 @@ namespace ArchiveWeb.Controllers
             var list = Document.GetListBackup();
             var data = DocumentList2Excel(list);
 
-            return File(data, "application/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Архив документов - резервная копия .xlsx");
+            return File(data, "application/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Архив документов - резервная копия от {DateTime.Now.ToString("dd-MM-yyyy")}.xlsx");
         }
 
         public byte[] DocumentList2Excel(IEnumerable<Document> list)
