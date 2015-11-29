@@ -32,6 +32,8 @@ namespace ArchiveWeb.Models
         public string Email { get; set; }
         public string ShortName{get; set;}
 
+        public List<AdGroup> AdGroups { get; set; }
+
         private static string GetShortName(string name)
         {
             if (String.IsNullOrEmpty(name)) return "Имя отсутствует";
@@ -67,12 +69,16 @@ namespace ArchiveWeb.Models
 
         public bool Is(params AdGroup[] groups)
         {
-            return AdHelper.UserIs(Login, groups);
+            return groups.Select(grp => AdGroups.Contains(grp)).Any(res => res);
+            //return AdHelper.UserIs(Login, groups);
         }
 
         public bool HasAccess(params AdGroup[] groups)
         {
-            return AdHelper.UserInGroup(Login, groups);
+            if (AdGroups == null || !AdGroups.Any()) return false;
+            if (AdGroups.Contains(AdGroup.SuperAdmin)) return true;
+            return groups.Select(grp => AdGroups.Contains(grp)).Any(res => res);
+            //return AdHelper.UserInGroup(Login, groups);
         }
     }
 }

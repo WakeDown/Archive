@@ -6,6 +6,7 @@ using System.Net;
 using System.Security.Principal;
 using System.Web;
 using System.Web.Mvc;
+using ArchiveWeb.Helpers;
 using ArchiveWeb.Models;
 
 namespace ArchiveWeb.Objects
@@ -64,6 +65,8 @@ namespace ArchiveWeb.Objects
                             user.Email = mail;
                             user.FullName = name;
                         }
+
+                        AdHelper.SetUserAdGroups(wi, ref user);
                     }
                 }
             }
