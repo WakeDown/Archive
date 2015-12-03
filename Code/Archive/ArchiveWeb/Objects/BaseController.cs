@@ -37,7 +37,12 @@ namespace ArchiveWeb.Objects
         [NonAction]
         public AdUser GetCurUser()
         {
-            AdUser user = new AdUser();
+            if (Session["CurUser"] != null)
+            {
+                return (AdUser)Session["CurUser"];
+            }
+
+                AdUser user = new AdUser();
             try
             {
                 string fakeSid = null;
@@ -74,6 +79,8 @@ namespace ArchiveWeb.Objects
             {
                 throw;
             }
+
+            Session["CurUser"] = user;
 
             return user;
         }

@@ -157,25 +157,25 @@
                     }
                 });
             });
-            var idCont = @Model.IdContractor;
+            var ctrUid = '@Model.ContractorUid';
             $.ajax({
                 url: '@Url.Action("GetContractorFullName")',
                 method: 'POST',
-                data: { id: idCont },
+                data: { uid: ctrUid },
                 success: function (data) {
                     $('#contractorFullName').text(data);
                 }
             });
-            
-            var idOrg = @Model.IdOrganization;
-            $.ajax({
-                url: '@Url.Action("GetContractorFullName")',
-                method: 'POST',
-                data: { id: idOrg },
-                success: function (data) {
-                    $('#organizationFullName').text(data);
-                }
-            });
+
+                var orgUid = '@Model.OrganizationUid';
+                $.ajax({
+                    url: '@Url.Action("GetContractorFullName")',
+                    method: 'POST',
+                    data: { uid: orgUid },
+                    success: function (data) {
+                        $('#organizationFullName').text(data);
+                    }
+                });
         })
     </script>
 }

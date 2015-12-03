@@ -131,21 +131,21 @@ else
                     }
                 });
             });
-            var idCont = @Model.IdContractor;
+            var ctrUid = '@Model.ContractorUid';
             $.ajax({
                 url: '@Url.Action("GetContractorFullName")',
                 method: 'POST',
-                data: { id: idCont },
+                data: { uid: ctrUid },
                 success: function (data) {
                     $('#contractorFullName').text(data);
                 }
             });
             
-                var idOrg = @Model.IdOrganization;
+                var orgUid = '@Model.OrganizationUid';
                 $.ajax({
                     url: '@Url.Action("GetContractorFullName")',
                     method: 'POST',
-                    data: { id: idOrg },
+                    data: { uid: orgUid },
                     success: function (data) {
                         $('#organizationFullName').text(data);
                     }

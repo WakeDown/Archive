@@ -14,11 +14,13 @@ namespace ArchiveWeb.Models
     {
         public int Id { get; set; }
         public int IdContractor { get; set; }
+        public string ContractorUid { get; set; }
         public string ContractorName { get; set; }
         public int? IdDocType { get; set; }
         public string DocType { get; set; }
         public DateTime DocDate { get; set; }
         public int IdOrganization { get; set; }
+        public string OrganizationUid { get; set; }
         public string Organization { get; set; }
         public string DocNumber { get; set; }
         public int? IdDocState { get; set; }
@@ -94,6 +96,8 @@ namespace ArchiveWeb.Models
             FileName = Db.DbHelper.GetValueString(row, "file_name");
             FileSid = Db.DbHelper.GetValueString(row, "file_sid");
             Enabled = Db.DbHelper.GetValueBool(row, "enabled");
+            ContractorUid = Db.DbHelper.GetValueString(row, "contractor_uid");
+            OrganizationUid = Db.DbHelper.GetValueString(row, "organization_uid");
 
             Place = new Place() {StackNumber = Db.DbHelper.GetValueString(row, "place_stack"),ShelfNumber = Db.DbHelper.GetValueIntOrDefault(row, "place_shelf"), FolderNumber = Db.DbHelper.GetValueIntOrDefault(row, "place_folder") };
         }
@@ -161,16 +165,18 @@ namespace ArchiveWeb.Models
             SqlParameter pDocNumber = new SqlParameter() { ParameterName = "doc_number", SqlValue = DocNumber, SqlDbType = SqlDbType.NVarChar };
             SqlParameter pSheetCount = new SqlParameter() { ParameterName = "sheet_count", SqlValue = SheetCount, SqlDbType = SqlDbType.Int };
             SqlParameter pIdOrganization = new SqlParameter() { ParameterName = "id_organization", SqlValue = IdOrganization, SqlDbType = SqlDbType.Int };
-            SqlParameter pOrganization = new SqlParameter() { ParameterName = "organization", SqlValue = Contractor.GetName(IdOrganization), SqlDbType = SqlDbType.NVarChar };
+            SqlParameter pOrganization = new SqlParameter() { ParameterName = "organization", SqlValue = Contractor.GetName(OrganizationUid), SqlDbType = SqlDbType.NVarChar };
             SqlParameter pIdDocType = new SqlParameter() { ParameterName = "id_doc_type", SqlValue = IdDocType, SqlDbType = SqlDbType.Int };
             SqlParameter pIdDocState = new SqlParameter() { ParameterName = "id_doc_state", SqlValue = DocState.GetFirstState().Id, SqlDbType = SqlDbType.Int };
             SqlParameter pIdContractor = new SqlParameter() { ParameterName = "id_contractor", SqlValue = IdContractor, SqlDbType = SqlDbType.Int };
-            SqlParameter pContractor = new SqlParameter() { ParameterName = "contractor", SqlValue = Contractor.GetName(IdContractor), SqlDbType = SqlDbType.NVarChar };
+            SqlParameter pContractor = new SqlParameter() { ParameterName = "contractor", SqlValue = Contractor.GetName(ContractorUid), SqlDbType = SqlDbType.NVarChar };
             SqlParameter pCreatorAdSid = new SqlParameter() { ParameterName = "creator_sid", SqlValue = creatorSid, SqlDbType = SqlDbType.VarChar };
             SqlParameter pFile = new SqlParameter() { ParameterName = "file", SqlValue = FileData, SqlDbType = SqlDbType.VarBinary };
-            SqlParameter pFileName = new SqlParameter() { ParameterName = "file_name", SqlValue = FileName, SqlDbType = SqlDbType.VarChar };
+            SqlParameter pFileName = new SqlParameter() { ParameterName = "file_name", SqlValue = FileName, SqlDbType = SqlDbType.NVarChar };
+            SqlParameter pContractorUid = new SqlParameter() { ParameterName = "contractor_uid", SqlValue = ContractorUid, SqlDbType = SqlDbType.VarChar };
+            SqlParameter pOrganizationUid = new SqlParameter() { ParameterName = "organization_uid", SqlValue = OrganizationUid, SqlDbType = SqlDbType.VarChar };
 
-            var dt = Db.Archive.ExecuteQueryStoredProcedure("document_add", pDocDate, pDocNumber, pSheetCount, pIdOrganization, pIdDocType, pIdDocState, pCreatorAdSid, pIdContractor, pContractor, pOrganization, pFile, pFileName);
+            var dt = Db.Archive.ExecuteQueryStoredProcedure("document_add", pDocDate, pDocNumber, pSheetCount, pIdOrganization, pIdDocType, pIdDocState, pCreatorAdSid, pIdContractor, pContractor, pOrganization, pFile, pFileName, pContractorUid, pOrganizationUid);
             
             if (dt.Rows.Count > 0)
             {

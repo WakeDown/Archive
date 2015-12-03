@@ -220,9 +220,9 @@ namespace ArchiveWeb.Controllers
             return Json(new {});
         }
         [HttpPost]
-        public JsonResult GetContractorFullName(int id)
+        public JsonResult GetContractorFullName(string uid)
         {
-            string name = Contractor.GetFullName(id);
+            string name = Contractor.GetFullName(uid);
             return Json(name);
         }
         [HttpPost]

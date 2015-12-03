@@ -50,7 +50,7 @@
                         </div>
                     </div>
                     <div>
-                        @Html.DropDownListFor(m => m.IdContractor, new SelectList(new List<string>()), "--введите поиск--", new { @class = "form-control required-mark text-sm", @id = "docContractor", required = "required", data_error = "Выберите Контрагента" })
+                        @Html.DropDownListFor(m => m.ContractorUid, new SelectList(new List<string>()), "--введите поиск--", new { @class = "form-control required-mark text-sm", @id = "docContractor", required = "required", data_error = "Выберите Контрагента" })
                         <p><small id="contractorFullName">&nbsp;</small></p>
                     </div>
                 </div>
@@ -69,7 +69,7 @@
                             </div>
                         </div>
                     </div>
-                    @Html.DropDownListFor(m => m.IdOrganization, new SelectList(new List<string>()), "--введите поиск--", new {@class = "form-control required-mark text-sm", @id = "organization", required = "required", data_error = "Выберите Юр. лицо Юнит"})
+                    @Html.DropDownListFor(m => m.OrganizationUid, new SelectList(new List<string>()), "--введите поиск--", new {@class = "form-control required-mark text-sm", @id = "organization", required = "required", data_error = "Выберите Юр. лицо Юнит"})
                     <p><small id="organizationFullName">&nbsp;</small></p>
                 </div>
                 @*<span class="help-block with-errors"></span>*@
@@ -135,24 +135,24 @@
             });
             $('#orgSearch').on('input', orgSearch);
             $('#docContractor').change(function() {
-                var id = $('#docContractor').val();
+                var uid = $('#docContractor').val();
                 $('#contractorFullName').html('&nbsp;');
                 $.ajax({
                     url: '@Url.Action("GetContractorFullName")',
                     method: 'POST',
-                    data: { id: id },
+                    data: { uid: uid },
                     success: function (data) {
                         $('#contractorFullName').text(data);
                     }
                 });
             });
             $('#organization').change(function () {
-                var id = $('#organization').val();
+                var uid = $('#organization').val();
                 $('#organizationFullName').html('&nbsp;');
                 $.ajax({
                     url: '@Url.Action("GetContractorFullName")',
                     method: 'POST',
-                    data: { id: id },
+                    data: { uid: uid },
                     success: function (data) {
                         $('#organizationFullName').text(data);
                     }
