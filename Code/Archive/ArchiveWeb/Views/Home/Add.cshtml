@@ -33,7 +33,8 @@
             <div class="form-group">
                 <label class="col-lg-2 control-label" for="t2docDate">Дата приема сотрудника</label>
                 <div class="col-lg-2">
-                    @Html.TextBoxFor(m => m.DocDate, new {@class = "form-control required-mark", @id = "t2docDate", required="required"})
+                    @*@Html.TextBoxFor(m => m.DocDate, new {@class = "form-control required-mark", @id = "t2docDate", required="required"})*@
+                    <input type="text" class="form-control required-mark" id="t2docDate" name="t2docDate" required="required" />
                 </div>
             </div>
             <div class="form-group">

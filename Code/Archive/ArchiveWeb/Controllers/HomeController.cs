@@ -61,6 +61,11 @@ namespace ArchiveWeb.Controllers
                     model.FileData = fileData;
                     model.FileName = file.FileName;
                 }
+                if (!String.IsNullOrEmpty(Request.Form["t2docDate"]))
+                {
+                    DateTime t2docDate = Convert.ToDateTime(Request.Form["t2docDate"]);
+                    model.DocDate = t2docDate;
+                }
                 int retCode = model.Add(CurUser.Sid);
                 //if (!complete) throw new Exception(responseMessage.ErrorMessage);
                 //return RedirectToAction("Edit", "Document", new { id = id });
