@@ -18,7 +18,8 @@ namespace ArchiveWeb.Controllers
             //ViewBag.CurUser = GetCurUser();
             //ViewBag.DocumentList = new List<Document>() { new Document() { DocNumber = "123" }, new Document() { DocNumber = "321" }, new Document() { DocNumber = "123" }, new Document() { DocNumber = "321" } }; 
             int totalCount;
-            var lst = Document.GetList(out totalCount, topRows, page, docNum, docDate, docType, dateCreate, state, place, idDoc, contractor);
+            bool t2CardView = CurUser.HasAccess(AdGroup.ArchiveT2CardView);
+            var lst = Document.GetList(out totalCount, topRows, page, docNum, docDate, docType, dateCreate, state, place, idDoc, contractor, t2CardView);
             ViewBag.TotalCount = totalCount;
             ViewBag.PlaceView = CurUser.HasAccess(AdGroup.ArchiveAddDoc);
             ViewBag.RequestCreate = CurUser.HasAccess(AdGroup.ArchiveCreateRequest);
@@ -100,8 +101,10 @@ namespace ArchiveWeb.Controllers
         public ActionResult Card(int? id)
         {
             if (!id.HasValue) return RedirectToAction("Add");
+            bool t2CardView = CurUser.HasAccess(AdGroup.ArchiveT2CardView);
             ViewBag.PlaceView = CurUser.HasAccess(AdGroup.ArchiveAddDoc);
-            var doc = new Document(id.Value);
+            var doc = new Document(id.Value, t2CardView);
+            if (doc.Id <= 0) return HttpNotFound();
             return View(doc);
         }
         [HttpGet]
@@ -109,7 +112,9 @@ namespace ArchiveWeb.Controllers
         {
             if (!CurUser.HasAccess(AdGroup.ArchiveAddDoc)) return RedirectToAction("AccessDenied", "Error");
             if (!id.HasValue) return RedirectToAction("Add");
-            var doc = new Document(id.Value);
+            bool t2CardView = CurUser.HasAccess(AdGroup.ArchiveT2CardView);
+            var doc = new Document(id.Value, t2CardView);
+            if (doc.Id <= 0) return HttpNotFound();
             return View(doc);
         }
         [HttpPost]
@@ -216,6 +221,7 @@ namespace ArchiveWeb.Controllers
         [HttpPost]
         public JsonResult DeleteFile(string sid)
         {
+            if (!CurUser.HasAccess(AdGroup.ArchiveDeleteFile)) return Json(new {});
             Document.DeleteFile(sid, CurUser.Sid);
             return Json(new {});
         }

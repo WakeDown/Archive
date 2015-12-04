@@ -14,7 +14,16 @@
             <a name="fileLink" href="@Url.Action("GetDocFileData", new {sid = Model.FileSid})" target="_blank">@Model.DocType</a>
         }
     </td>
-    <td>@Model.ContractorName</td>
+    <td>
+        @if (Model.IdDocType == 7)
+        {
+            @(String.Format("{0} {1} {2}", Model.Surname, Model.Name, Model.Patronymic))
+        }
+        else
+        {
+            @Model.ContractorName
+        }
+    </td>
     @*<td>@Model.DateCreate.ToString("dd.MM.yyyy")<div class="small">@Model.CreatorName</div></td>*@
     <td>
         @Model.State

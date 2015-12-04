@@ -14,6 +14,7 @@ namespace ArchiveWeb.Objects
         ArchiveCreateRequest,
         ArchiveDeleteFile,
         ArchiveDeleteRecord,
-        ArchivePlacesEditor
+        ArchivePlacesEditor,
+        ArchiveT2CardView
     }
 }

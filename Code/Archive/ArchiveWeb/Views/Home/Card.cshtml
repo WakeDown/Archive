@@ -58,19 +58,38 @@ else
                 @Model.DocNumber
             </div>
         </div>
-        <div class="form-group">
-            <label class="col-lg-2 control-label no-pad-top" for="docDate">Дата документа</label>
-            <div class="col-lg-2">
-                @Model.DocDate.ToString("dd.MM.yyyy")
+        @if (Model.IdDocType == 7)
+        {
+            <div class="form-group">
+                <label class="col-lg-2 control-label no-pad-top" >Дата приема сотрудника</label>
+                <div class="col-lg-2">
+                    @Model.DocDate.ToString("dd.MM.yyyy")
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            <label class="col-lg-2 control-label no-pad-top" for="docContractor">Контрагент</label>
-            <div class="col-lg-10">
-                @Model.ContractorName
-                <div><small id="contractorFullName">&nbsp;</small></div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label no-pad-top" >ФИО сотрудника</label>
+                <div class="col-lg-10">
+                    @Model.Surname @Model.Name @Model.Patronymic
+                </div>
             </div>
-        </div>
+        }
+        else
+        {
+            <div class="form-group">
+                <label class="col-lg-2 control-label no-pad-top" for="docDate">Дата документа</label>
+                <div class="col-lg-2">
+                    @Model.DocDate.ToString("dd.MM.yyyy")
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label no-pad-top" for="docContractor">Контрагент</label>
+                <div class="col-lg-10">
+                    @Model.ContractorName
+                    <div><small id="contractorFullName">&nbsp;</small>
+                    </div>
+                </div>
+            </div>
+        }
         <div class="form-group">
             <label class="col-lg-2 control-label no-pad-top" for="organization">Юр. лицо Юнит</label>
             <div class="col-lg-10">

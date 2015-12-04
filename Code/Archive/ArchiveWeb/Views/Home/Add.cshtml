@@ -18,43 +18,64 @@
     @using (Html.BeginForm("Add", "Home", FormMethod.Post, new { @class = "form-horizontal", enctype = "multipart/form-data", role = "form" }))
     {
         <div class="form-group">
-                <label class="col-lg-2 control-label" for="docType">Тип документа</label>
-                <div class="col-lg-4">
-                    @Html.DropDownListFor(m => m.IdDocType, new SelectList(DocType.GetList(), "Id", "Name"), "--выберите тип документа--", new { @class = "form-control required-mark", @id = "docType", required = "required", data_error = "Выберите Тип документа" })
-                    @*<span class="help-block with-errors"></span>*@
-                </div>
+            <label class="col-lg-2 control-label" for="docType">Тип документа</label>
+            <div class="col-lg-4">
+                @Html.DropDownListFor(m => m.IdDocType, new SelectList(DocType.GetList(), "Id", "Name"), "--выберите тип документа--", new {@class = "form-control required-mark", @id = "docType", required = "required", data_error = "Выберите Тип документа"})
             </div>
+        </div>
         <div class="form-group">
             <label class="col-lg-2 control-label" for="docNumber">Номер документа</label>
             <div class="col-lg-4">
-                    @Html.TextBoxFor(m => m.DocNumber, new {@class = "form-control required-mark", @id = "docNumber", required = "required" })
-                @*<span class="help-block with-errors"></span>*@
+                @Html.TextBoxFor(m => m.DocNumber, new { @class = "form-control required-mark", @id = "docNumber", required = "required" })
             </div>
         </div>
-        <div class="form-group">
-            <label class="col-lg-2 control-label" for="docDate">Дата документа</label>
-            <div class="col-lg-2">
-                @Html.TextBoxFor(m => m.DocDate, new {@class = "form-control required-mark", @id = "docDate", required = "required" })
-                @*<span class="help-block with-errors"></span>*@
+        <div id="t2card" style="display: none">
+            <div class="form-group">
+                <label class="col-lg-2 control-label" for="t2docDate">Дата приема сотрудника</label>
+                <div class="col-lg-2">
+                    @Html.TextBoxFor(m => m.DocDate, new {@class = "form-control required-mark", @id = "t2docDate", required="required"})
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label" for="fio">ФИО сотрудника</label>
+                <div class="col-lg-2">
+                    @Html.TextBoxFor(m => m.Surname, new {@class = "form-control required-mark", @id = "surname", placeholder="Фамилия", required = "required"})
+                </div>
+                <div class="col-lg-2">
+                    @Html.TextBoxFor(m => m.Name, new {@class = "form-control required-mark", @id = "name", placeholder = "Имя", required = "required"})
+                </div>
+                <div class="col-lg-2">
+                    @Html.TextBoxFor(m => m.Patronymic, new { @class = "form-control required-mark", @id = "patronymic", placeholder = "Отчетсво", required = "required" })
+                </div>
             </div>
         </div>
-        <div class="form-group no-marg-bot">
-            <label class="col-lg-2 control-label" for="docContractor">Контрагент</label>
-            <div class="col-lg-10">
-                <div class="input-group">
-                    <div class="input-group-btn" style="width: 150px; vertical-align: top;">
-                        <div class="input-group">
-                            <input type="text" class="form-control" placeholder="поиск" id="ctrSearch"/>
-                            <div class="input-group-btn"><a href="#!"><i class="fa fa-search"></i></a>
+        <div id="common" style="display: none">
+            <div class="form-group">
+                <label class="col-lg-2 control-label" for="docDate">Дата документа</label>
+                <div class="col-lg-2">
+                    @Html.TextBoxFor(m => m.DocDate, new {@class = "form-control required-mark", @id = "docDate", required="required"})
+                </div>
+            </div>
+            <div class="form-group no-marg-bot">
+                <label class="col-lg-2 control-label" for="docContractor">Контрагент</label>
+                <div class="col-lg-10">
+                    <div class="input-group">
+                        <div class="input-group-btn" style="width: 150px; vertical-align: top;">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="поиск" id="ctrSearch"/>
+                                <div class="input-group-btn">
+                                    <a href="#!"><i class="fa fa-search"></i></a>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div>
-                        @Html.DropDownListFor(m => m.ContractorUid, new SelectList(new List<string>()), "--введите поиск--", new { @class = "form-control required-mark text-sm", @id = "docContractor", required = "required", data_error = "Выберите Контрагента" })
-                        <p><small id="contractorFullName">&nbsp;</small></p>
+                        <div>
+                            @Html.DropDownListFor(m => m.ContractorUid, new SelectList(new List<string>()), "--введите поиск--", new {@class = "form-control required-mark text-sm", @id = "docContractor", required = "required", data_error = "Выберите Контрагента"})
+                            <p>
+                                <small id="contractorFullName">&nbsp;</small>
+                            </p>
+                        </div>
                     </div>
                 </div>
-                @*<span class="help-block with-errors"></span>*@
             </div>
         </div>
         <div class="form-group no-marg-bot">
@@ -63,30 +84,23 @@
                 <div class="input-group">
                     <div class="input-group-btn" style="width: 150px; vertical-align: top;">
                         <div class="input-group">
-                            <input type="text" class="form-control" placeholder="поиск" id="orgSearch"/>
+                            <input type="text" class="form-control" placeholder="поиск" id="orgSearch" />
                             <div class="input-group-btn">
                                 <a href="#!"><i class="fa fa-search"></i></a>
                             </div>
                         </div>
                     </div>
-                    @Html.DropDownListFor(m => m.OrganizationUid, new SelectList(new List<string>()), "--введите поиск--", new {@class = "form-control required-mark text-sm", @id = "organization", required = "required", data_error = "Выберите Юр. лицо Юнит"})
-                    <p><small id="organizationFullName">&nbsp;</small></p>
+                    @Html.DropDownListFor(m => m.OrganizationUid, new SelectList(new List<string>()), "--введите поиск--", new { @class = "form-control required-mark text-sm", @id = "organization", required = "required", data_error = "Выберите Юр. лицо Юнит" })
+                    <p>
+                        <small id="organizationFullName">&nbsp;</small>
+                    </p>
                 </div>
-                @*<span class="help-block with-errors"></span>*@
             </div>
         </div>
-        @*<div class="form-group">
-            <label class="col-lg-2 control-label" for="organization">Юр. лицо Юнит</label>
-            <div class="col-lg-4">
-                @Html.DropDownListFor(m => m.IdOrganization, new SelectList(Organization.GetSelectionList(), "Key", "Value"), "--выберите юр. лицо--", new {@class = "form-control required-mark", @id = "organization", required = "required", data_error = "Выберите Юр. лицо Юнит"})
-                <span class="help-block with-errors"></span>
-            </div>
-        </div>*@
         <div class="form-group">
             <label class="col-lg-2 control-label" for="sheetCount">Количество листов</label>
             <div class="col-lg-2">
                 @Html.TextBoxFor(m => m.SheetCount, new { @class = "form-control required-mark", @id = "sheetCount", required="required" })
-                @*<span class="help-block with-errors"></span>*@
             </div>
         </div>
         <div class="form-group">
@@ -118,8 +132,16 @@
 @section scripts
 {
     <script type="text/javascript">
-        $(function() {
+
+        $(function () {
+            $('#docType').change(formDisplay);
+
             $('#docDate').datepicker({
+                autoclose: true,
+                todayBtn: "linked",
+                language: "ru"
+            });
+            $('#t2docDate').datepicker({
                 autoclose: true,
                 todayBtn: "linked",
                 language: "ru"
@@ -159,6 +181,23 @@
                 });
             });
         });
+
+        function formDisplay() {
+            var type = $(this).val();
+            var $t2card = $('#t2card');
+            var $common = $('#common');
+            if (type == 7) {
+                $t2card.show();
+                $common.hide();
+                $('[required="required"]', $common).removeAttr('required');
+                $('.required-mark', $t2card).attr('required', 'required');
+                return;
+            }
+            $t2card.hide();
+            $common.show();
+            $('[required="required"]', $t2card).removeAttr('required');
+            $('.required-mark', $common).attr('required', 'required');
+        }
 
         function orgSearch(e) {
             var $select = $('#organization');

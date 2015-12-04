@@ -31,6 +31,10 @@ namespace ArchiveWeb.Models
         
         public Place Place { get; set; }
 
+        public string Surname { get; set; }
+        public string Name { get; set; }
+        public string Patronymic { get; set; }
+
 
         /// <summary>
         /// Стеллаж
@@ -55,10 +59,11 @@ namespace ArchiveWeb.Models
 
         public Document() { }
 
-        public Document(int id)
+        public Document(int id, bool t2cardView = false)
         {
             SqlParameter pId = new SqlParameter() { ParameterName = "id", SqlValue = id, SqlDbType = SqlDbType.Int };
-            var dt = Db.Archive.ExecuteQueryStoredProcedure("document_get", pId);
+            SqlParameter pT2CardView = new SqlParameter() { ParameterName = "t2card_view", SqlValue = t2cardView, SqlDbType = SqlDbType.Bit };
+            var dt = Db.Archive.ExecuteQueryStoredProcedure("document_get", pId, pT2CardView);
             if (dt.Rows.Count > 0)
             {
                 FillSelf(dt.Rows[0]);
@@ -98,11 +103,14 @@ namespace ArchiveWeb.Models
             Enabled = Db.DbHelper.GetValueBool(row, "enabled");
             ContractorUid = Db.DbHelper.GetValueString(row, "contractor_uid");
             OrganizationUid = Db.DbHelper.GetValueString(row, "organization_uid");
+            Surname = Db.DbHelper.GetValueString(row, "surname");
+            Name = Db.DbHelper.GetValueString(row, "name");
+            Patronymic = Db.DbHelper.GetValueString(row, "patronymic");
 
             Place = new Place() {StackNumber = Db.DbHelper.GetValueString(row, "place_stack"),ShelfNumber = Db.DbHelper.GetValueIntOrDefault(row, "place_shelf"), FolderNumber = Db.DbHelper.GetValueIntOrDefault(row, "place_folder") };
         }
 
-        public static IEnumerable<Document> GetList(out int totalCount, int? topRows = null, int? pageNum = null, string docNum = null, string docDate=null, string docType = null, string dateCreate = null, string state = null, string place = null, string id = null, string contractor = null)
+        public static IEnumerable<Document> GetList(out int totalCount, int? topRows = null, int? pageNum = null, string docNum = null, string docDate=null, string docType = null, string dateCreate = null, string state = null, string place = null, string id = null, string contractor = null, bool t2cardView = false)
         {
             if (!topRows.HasValue) topRows = 30;
             if (!pageNum.HasValue) pageNum = 1;
@@ -117,7 +125,8 @@ namespace ArchiveWeb.Models
             SqlParameter pPlace = new SqlParameter() { ParameterName = "place", SqlValue = place, SqlDbType = SqlDbType.NVarChar };
             SqlParameter pId = new SqlParameter() { ParameterName = "id", SqlValue = id, SqlDbType = SqlDbType.NVarChar };
             SqlParameter pContractor = new SqlParameter() { ParameterName = "contractor", SqlValue = contractor, SqlDbType = SqlDbType.NVarChar };
-            var dt = Db.Archive.ExecuteQueryStoredProcedure("document_get_list", pTopRows, pPageNum, pDocNum, pDocDate, pDocType, pDateCreate, pState, pPlace, pId, pContractor);
+            SqlParameter pT2CardView = new SqlParameter() { ParameterName = "t2card_view", SqlValue = t2cardView, SqlDbType = SqlDbType.Bit };
+            var dt = Db.Archive.ExecuteQueryStoredProcedure("document_get_list", pTopRows, pPageNum, pDocNum, pDocDate, pDocType, pDateCreate, pState, pPlace, pId, pContractor, pT2CardView);
 
             totalCount = 0;
             var lst = new List<Document>();
@@ -175,8 +184,11 @@ namespace ArchiveWeb.Models
             SqlParameter pFileName = new SqlParameter() { ParameterName = "file_name", SqlValue = FileName, SqlDbType = SqlDbType.NVarChar };
             SqlParameter pContractorUid = new SqlParameter() { ParameterName = "contractor_uid", SqlValue = ContractorUid, SqlDbType = SqlDbType.VarChar };
             SqlParameter pOrganizationUid = new SqlParameter() { ParameterName = "organization_uid", SqlValue = OrganizationUid, SqlDbType = SqlDbType.VarChar };
+            SqlParameter pSurname = new SqlParameter() { ParameterName = "surname", SqlValue = Surname, SqlDbType = SqlDbType.NVarChar };
+            SqlParameter pName = new SqlParameter() { ParameterName = "name", SqlValue = Name, SqlDbType = SqlDbType.NVarChar };
+            SqlParameter pPatronymic = new SqlParameter() { ParameterName = "patronymic", SqlValue = Patronymic, SqlDbType = SqlDbType.NVarChar };
 
-            var dt = Db.Archive.ExecuteQueryStoredProcedure("document_add", pDocDate, pDocNumber, pSheetCount, pIdOrganization, pIdDocType, pIdDocState, pCreatorAdSid, pIdContractor, pContractor, pOrganization, pFile, pFileName, pContractorUid, pOrganizationUid);
+            var dt = Db.Archive.ExecuteQueryStoredProcedure("document_add", pDocDate, pDocNumber, pSheetCount, pIdOrganization, pIdDocType, pIdDocState, pCreatorAdSid, pIdContractor, pContractor, pOrganization, pFile, pFileName, pContractorUid, pOrganizationUid, pSurname, pName, pPatronymic);
             
             if (dt.Rows.Count > 0)
             {
@@ -199,7 +211,8 @@ namespace ArchiveWeb.Models
         }
 
         public void Update(string creatorSid)
-        {SqlParameter pId = new SqlParameter() { ParameterName = "id", SqlValue = Id, SqlDbType = SqlDbType.Int };
+        {
+            SqlParameter pId = new SqlParameter() { ParameterName = "id", SqlValue = Id, SqlDbType = SqlDbType.Int };
             SqlParameter pStack = new SqlParameter() { ParameterName = "stack", SqlValue = Stack, SqlDbType = SqlDbType.NVarChar };
             SqlParameter pShelf = new SqlParameter() { ParameterName = "shelf", SqlValue = Shelf, SqlDbType = SqlDbType.NVarChar };
             SqlParameter pFolder = new SqlParameter() { ParameterName = "folder", SqlValue = Folder, SqlDbType = SqlDbType.NVarChar };
