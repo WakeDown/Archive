@@ -69,9 +69,9 @@ namespace ArchiveWeb.Controllers
                 int retCode = model.Add(CurUser.Sid);
                 //if (!complete) throw new Exception(responseMessage.ErrorMessage);
                 //return RedirectToAction("Edit", "Document", new { id = id });
+                bool exists = retCode == -999;
 
-                
-                return RedirectToAction("DocumentPlace",new { id= model.Id, exists= retCode==-999 });
+                return RedirectToAction("DocumentPlace",new { id = model.Id, exists = exists });
 
                 if (!String.IsNullOrEmpty(Request.Form["CreateAndClose"]))
                 {
@@ -97,7 +97,8 @@ namespace ArchiveWeb.Controllers
         public ActionResult DocumentPlace(int? id, bool? exists)
         {
             if (!id.HasValue) return HttpNotFound();
-            var doc = new Document(id.Value);
+            bool t2CardView = CurUser.HasAccess(AdGroup.ArchiveT2CardView);
+            var doc = new Document(id.Value, t2CardView);
             ViewBag.Exists = exists;
             return View(doc);
         }
