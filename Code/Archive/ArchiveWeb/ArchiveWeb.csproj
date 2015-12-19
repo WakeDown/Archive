@@ -129,6 +129,7 @@
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PlaceController.cs" />
+    <Compile Include="Controllers\RequestController.cs" />
     <Compile Include="Controllers\StakeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -136,8 +137,10 @@
     <Compile Include="Helpers\AdHelper.cs" />
     <Compile Include="Helpers\DbHelper.cs" />
     <Compile Include="Helpers\MainHelper.cs" />
+    <Compile Include="Helpers\MessageHelper.cs" />
     <Compile Include="Helpers\UrlHelperExtension.cs" />
     <Compile Include="Models\Contractor.cs" />
+    <Compile Include="Models\DocRequestState.cs" />
     <Compile Include="Models\DocState.cs" />
     <Compile Include="Models\DocType.cs" />
     <Compile Include="Models\Document.cs" />
@@ -145,9 +148,11 @@
     <Compile Include="Models\Organization.cs" />
     <Compile Include="Models\AdUser.cs" />
     <Compile Include="Models\Place.cs" />
+    <Compile Include="Models\DocRequest.cs" />
     <Compile Include="Models\Stake.cs" />
     <Compile Include="Objects\AdGroup.cs" />
     <Compile Include="Objects\AdUserGroup.cs" />
+    <Compile Include="Objects\AttachmentFile.cs" />
     <Compile Include="Objects\BaseController.cs" />
     <Compile Include="Objects\DbModel.cs" />
     <Compile Include="Objects\WindowsImpersonationContextFacade.cs" />
@@ -236,6 +241,7 @@
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Scripts\npm.js" />
     <Content Include="Scripts\respond.js" />
+    <Content Include="Scripts\spinner.js" />
     <Content Include="Scripts\_references.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -264,6 +270,7 @@
     <Content Include="Views\Stake\Index.cshtml" />
     <Content Include="Views\Stake\Create.cshtml" />
     <Content Include="Views\Home\DocumentPlace.cshtml" />
+    <Content Include="Views\Request\Index.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

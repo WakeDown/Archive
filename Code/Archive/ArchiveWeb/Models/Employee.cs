@@ -10,6 +10,9 @@ namespace ArchiveWeb.Models
 {
     public class Employee
     {
+
+
+
         public static IEnumerable<KeyValuePair<string, string>> GetOutSelectionList(string name = null)
         {
             SqlParameter pName = new SqlParameter() { ParameterName = "name", SqlValue = name, SqlDbType = SqlDbType.NVarChar };
@@ -22,5 +25,7 @@ namespace ArchiveWeb.Models
             }
             return lst;
         } 
+
+
     }
 }

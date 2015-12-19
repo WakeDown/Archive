@@ -2,6 +2,7 @@
 
 @using ArchiveWeb.Helpers
 @using ArchiveWeb.Models
+@using ArchiveWeb.Objects
 @{
     ViewBag.Title = "Список документов";
     int topRows = Request.QueryString["topRows"] != null ? Convert.ToInt32(Request.QueryString["topRows"]) : 30;
@@ -75,7 +76,11 @@
         <div class="pull-left pad-l-sm">
             @if (ViewBag.PlaceView != null && ViewBag.PlaceView)
             {
-                <a href="@Url.Action("GetDocumentListBackup")" class="btn btn-primary"><i class="fa fa-file-excel-o"></i> резервная копия</a>
+                <a href="@Url.Action("GetDocumentListBackup")" class="btn btn-primary"><i class="fa fa-file-excel-o"></i> Резервная копия</a>
+            }
+            @if (ViewBag.CurUser.HasAccess(AdGroup.ArchiveCreateRequest))
+            {
+                <button id="createRequest" class="btn btn-primary">Оформить запрос <span id="requestDocCount" class="badge">0</span></button>
             }
         </div>
     </div>
@@ -98,41 +103,47 @@
 </div>
 <table id="docList" class="table table-bordered table-striped">
     <thead>
-        <tr class="bg-primary">
-            <th class="min-width">
-                <input id="idDoc" class="form-control input-xs" placeholder="ID" value="@Request.QueryString["idDoc"]" style="width:50px;" />
+    <tr class="bg-primary">
+        @if (ViewBag.CurUser.HasAccess(AdGroup.ArchiveCreateRequest))
+        {
+            <th class="min-width text-nowrap">
+                <input id="chkAll" type="checkbox" value="all" title="все" />
             </th>
-            <th>
-                <input id="docNumber" class="form-control input-xs" placeholder="№ документа" value="@Request.QueryString["docNum"]" />
-            </th>
-            <th>
-                <input id="docDate" class="form-control input-xs" placeholder="Дата документа" value="@Request.QueryString["docDate"]" />
-            </th>
-            <th>
-                <input id="docType" class="form-control input-xs" placeholder="Тип документа" value="@Request.QueryString["docType"]" />
-            </th>
-            <th>
-                <input id="contractor" class="form-control input-xs" placeholder="Контрагент" value="@Request.QueryString["contractor"]" />
-            </th>
-            @*<th>
+        }
+        <th class="min-width">
+            <input id="idDoc" class="form-control input-xs" placeholder="ID" value="@Request.QueryString["idDoc"]" style="width: 50px;"/>
+        </th>
+        <th>
+            <input id="docNumber" class="form-control input-xs" placeholder="№ документа" value="@Request.QueryString["docNum"]"/>
+        </th>
+        <th>
+            <input id="docDate" class="form-control input-xs" placeholder="Дата документа" value="@Request.QueryString["docDate"]"/>
+        </th>
+        <th>
+            <input id="docType" class="form-control input-xs" placeholder="Тип документа" value="@Request.QueryString["docType"]"/>
+        </th>
+        <th>
+            <input id="contractor" class="form-control input-xs" placeholder="Контрагент" value="@Request.QueryString["contractor"]"/>
+        </th>
+        @*<th>
                     <input id="dateCreate" class="form-control input-xs" placeholder="Создано" value="@Request.QueryString["dateCreate"]" />
                 </th>*@
+        <th>
+            <input id="state" class="form-control input-xs" placeholder="Статус" value="@Request.QueryString["state"]"/>
+        </th>
+        @if (ViewBag.PlaceView != null && ViewBag.PlaceView)
+        {
             <th>
-                <input id="state" class="form-control input-xs" placeholder="Статус" value="@Request.QueryString["state"]" />
+                <input id="place" class="form-control input-xs" placeholder="Местоположение" value="@Request.QueryString["place"]"/>
             </th>
-            @if (ViewBag.PlaceView != null && ViewBag.PlaceView)
-            {
-                <th>
-                    <input id="place" class="form-control input-xs" placeholder="Местоположение" value="@Request.QueryString["place"]" />
-                </th>
-            }
-            @if (ViewBag.PlaceView != null && ViewBag.PlaceView)
-            {
-                <th>
-                    <a href="@Url.Action("Index")" class="btn btn-default btn-sm" title="очистить фильтр"><i class="fa fa-refresh"></i></a>
-                </th>
-            }
-        </tr>
+        }
+        @if (ViewBag.PlaceView != null && ViewBag.PlaceView)
+        {
+            <th>
+                <a href="@Url.Action("Index")" class="btn btn-default btn-sm" title="очистить фильтр"><i class="fa fa-refresh"></i></a>
+            </th>
+        }
+    </tr>
     </thead>
     @foreach (Document doc in Model)
     {
@@ -271,6 +282,8 @@
 {
     <script type="text/javascript">
         $(function () {
+            $('#chkAll').click(checkAllOnPage);
+            $('#createRequest').click(createRequest);
             $('#docNumber').keypress(
                 function (e) {
                     if (e.keyCode != 13) return;
@@ -385,7 +398,47 @@
                 empSearch(e);
             });
             $('#empSearch').on('input', empSearch);
+            $('[name="rowCheck"]').click(checkedDocsCalculate);
         });
+
+        function createRequest() {
+            showSpinnerAppend(this);
+            var count = $('[name="rowCheck"]:checked').length;
+            if (count <= 0) alert('Выберите документы. Ни один документ не выбран.');
+            var arrId = [];
+            $('[name="rowCheck"]:checked').each(function () {
+                var $this = $(this);
+                arrId.push($this.attr('value'));
+            });
+            
+            $.ajax({
+                url: '@Url.Action("CreateRequest", "Request")',
+                method: 'POST',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify({ ids: arrId }),
+                success: function(data) {
+                    alert('Создан запрос №' + data.id);
+                    window.location.reload();
+                },
+                error: function() {
+                    alert('Ошибка!');
+                }
+            });
+        }
+
+        function checkedDocsCalculate(e) {
+            e.stopPropagation();
+            var count = $('[name="rowCheck"]:checked').length;
+            $('#requestDocCount').text(count);
+        }
+
+        function checkAllOnPage(e) {
+            
+            var checked = $('#chkAll').is(':checked');
+            $('[name="rowCheck"]').prop('checked', checked);
+            checkedDocsCalculate(e);
+        }
 
         function empSearch(e) {
             var emp = $('#empSearch').val();

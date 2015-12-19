@@ -1,12 +1,27 @@
-﻿@model ArchiveWeb.Models.Document
-    
+﻿@using ArchiveWeb.Helpers
+@using ArchiveWeb.Objects
+@model ArchiveWeb.Models.Document
+
 <tr class="doc-row" id="@Model.Id">
+    @if (ViewBag.CurUser.HasAccess(AdGroup.ArchiveCreateRequest))
+    {
+        <td>
+            @if (!Model.IsRequested)
+            {
+                <input name="rowCheck" type="checkbox" value="@Model.Id"/>
+            }
+            else
+            {
+                <a href="@Url.Action("Index", "Request")?idReq=@Model.IdRequest">Запрос №@Model.IdRequest</a>
+            }
+        </td>
+    }
     <th>@Model.Id</th>
     <td>@Model.DocNumber</td>
     <td>@Model.DocDate.ToString("dd.MM.yyyy")</td>
     <td>
         @if (String.IsNullOrEmpty(Model.FileSid))
-            {
+        {
             @Model.DocType
         }
         else
@@ -42,34 +57,33 @@
             </div>
         }
     </td>
-@if (ViewBag.PlaceView != null && ViewBag.PlaceView)
-{
-    <td>
-        <div><small>Стеллаж - @(Model.Place.StackNumber ?? "неизвестно")</small>
-        </div>
-        <div><small>Полка - @(Model.Place.ShelfNumber ==0? "неизвестно": Model.Place.ShelfNumber.ToString())</small>
-        </div>
-        <div><small>Папка - @(Model.Place.FolderNumber==0 ? "неизвестно": Model.Place.FolderNumber.ToString())</small>
-        </div>
-    </td>
-}
-    
-@if (ViewBag.PlaceView != null && ViewBag.PlaceView)
-{
-    <td>
-        @if (Model.DocStateSysName.Equals("NEW") || Model.DocStateSysName.Equals("OUT"))
-        {
-            <a name="archive" class="btn btn-success btn-sm" title="В архив"><i class="fa fa-reply"></i></a>
-        }
-        else if (Model.DocStateSysName.Equals("ARCHIVE"))
-        {
-            <a name="out" class="btn btn-warning btn-sm" title="Выдать"><i class="fa fa-mail-forward"></i></a>
-        }
+    @if (ViewBag.PlaceView != null && ViewBag.PlaceView)
+    {
+        <td>
+            <div><small>Стеллаж - @(Model.Place.StackNumber ?? "неизвестно")</small>
+            </div>
+            <div><small>Полка - @(Model.Place.ShelfNumber == 0 ? "неизвестно" : Model.Place.ShelfNumber.ToString())</small>
+            </div>
+            <div><small>Папка - @(Model.Place.FolderNumber == 0 ? "неизвестно" : Model.Place.FolderNumber.ToString())</small>
+            </div>
+        </td>
+    }
+
+    @if (ViewBag.PlaceView != null && ViewBag.PlaceView)
+    {
+        <td>
+            @if (Model.DocStateSysName.Equals("NEW") || Model.DocStateSysName.Equals("OUT"))
+            {
+                <a name="archive" class="btn btn-success btn-sm" title="В архив"><i class="fa fa-reply"></i></a>
+            }
+            @*else if (Model.DocStateSysName.Equals("ARCHIVE"))
+            {
+                <a name="out" class="btn btn-warning btn-sm" title="Выдать"><i class="fa fa-mail-forward"></i></a>
+            }*@
         @*@if (ViewBag.RequestCreate != null && ViewBag.RequestCreate)
         {
             
-        }*@
-    </td>
-}
+        }*@</td>
+    }
 </tr>
 

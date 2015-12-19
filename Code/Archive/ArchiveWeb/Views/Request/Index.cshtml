@@ -1,0 +1,158 @@
+﻿@using ArchiveWeb.Models
+@model IEnumerable<ArchiveWeb.Models.DocRequest>
+
+<table class="table table-bordered table-striped">
+    <thead>
+    <tr class="bg-primary">
+        <th class="min-width">
+            <input id="idReq" class="form-control input-xs" placeholder="ID" value="@Request.QueryString["idReq"]" style="width: 50px;" />
+        </th>
+        <th>
+            <input id="reqDate" class="form-control input-xs" placeholder="Дата запроса" value="@Request.QueryString["reqDate"]" />
+        </th>
+        <th class="text-nowrap">
+            <input id="auth" class="form-control input-xs" placeholder="Автор запроса" value="@Request.QueryString["auth"]" />
+        </th>
+        <th>Документы
+            <button class="btn btn-default btn-sm" id="showAllDocsList">Показать все <span class="badge">@Model.Sum(x=>x.DocsCount)</span></button>
+        </th>
+        <th>Статус запроса</th>
+        <th class="min-width"></th>
+    </tr>
+    </thead>
+    <tbody>
+        @if (Model.Any())
+        {
+            foreach (DocRequest request in Model)
+            {
+                <tr class="table-row">
+                    <th>@request.Id</th>
+                    <td>@request.DateCreate.ToString("dd.MM.yyyy")</td>
+                    <td>@request.CreatorName</td>
+                    <td name="docsList"><button class="btn btn-default btn-sm" name="showDocsList" reqId="@request.Id" @(request.State.IsOut ? "showCame=showCame" : String.Empty)>Показать список <span class="badge">@request.DocsCount</span></button></td>
+                    <td>@request.State.Name</td>
+                    <td>
+                        @if (request.State.SysName.Equals("SENT"))
+                        {
+                            <button name="reqWork" class="btn btn-primary"><i class="fa fa-reorder"></i> Готов к выдаче</button>
+                        }
+                        else if (request.State.SysName.Equals("WORK"))
+                        {
+                            <button name="reqGiven" class="btn btn-warning"><i class="fa fa-mail-forward"></i> Выдан</button>
+                        }
+                    </td>
+                </tr>
+            }
+
+        }
+        else
+        {
+            <tr>
+                <td>пусто</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section scripts
+{
+    <script type="text/javascript">
+        $(function () {
+            $('#idReq').keypress(
+                function (e) {
+                    if (e.keyCode != 13) return;
+                    search();
+                });
+            $('#reqDate').keypress(
+                function (e) {
+                    if (e.keyCode != 13) return;
+                    search();
+                });
+            $('#auth').keypress(
+                function (e) {
+                    if (e.keyCode != 13) return;
+                    search();
+                });
+            $('[name="reqWork"]').click(function() {
+                showSpinnerAppend(this);
+                var $this = $(this);
+                $.ajax({
+                    url:'@Url.Action("")',
+                    success:function() {
+                        
+                        hideSpinner($this);
+                    },
+                    error: function () {
+                        hideSpinner($this);
+                    }
+                });
+            });
+            $('#showAllDocsList').click(function() {
+                var btns = $('[name=showDocsList]');
+                showSpinnerAppend(this);
+                for (var i = 0; i < btns.length; i++) {
+                    btns[i].click();
+                }
+                $(this).remove();
+            });
+            $('[name=showDocsList]').click(function () {
+                showSpinnerAppend(this);
+                var $this = $(this);
+                var reqId = $this.attr('reqId');
+                var $docsList = $this.closest('[name=docsList]');
+                var showBtnCame = $this.attr('showCame') === 'showCame';
+                $.ajax({
+                    url: '@Url.Action("GetDocumentList")',
+                    method: 'POST',
+                    data: { idRequest: reqId },
+                    success: function(data) {
+                        if (data && data.length > 0) {
+                            
+                            var $table = $('<table class="table table-bordered table-striped text-sm"></table>');
+                            $table.append($('<thead><tr class="bg-primary"><th>№ документа</th><th>Дата документа</th><th>Тип документа</th><th>Контрагент</th><th>Статус</th></tr></thead>'));
+                            for (var i = 0; i < data.length; i++) {
+                                var item = data[i];
+                                var element = $('<tr><td>' + item.DocNumber + '</td><td>' + item.DocDateStr + '</td><td>' + item.DocType + '</td><td>' + item.ContractorName + '</td>' +
+                                    (showBtnCame==true ? '<td>' +
+                                            '<button name="docCame" class="btn btn-success btn-sm"><i class="fa fa-mail-reply"></i> Получен</button>' +
+                                        '</td>' : '') +
+                                    '</tr>');
+                                $table.append(element);
+                            }
+                            $docsList.append($table);
+                            //$this.closest('[name=docCount]').remove();
+                            $this.remove();
+                        }
+                    },
+                    error:function() {
+                        alert('Ошибка!');
+                        hideSpinner($this);
+                    }
+                });
+                //$docsList.append();
+            });
+        });
+
+        function search() {
+            var curUrl = '@Request.RawUrl';
+            var url = curUrl;
+            var reqDate = $('#reqDate').val();
+            url = updateQueryStringParameter(url, 'reqDate', reqDate);
+            var auth = $('#auth').val();
+            url = updateQueryStringParameter(url, 'auth', auth);
+            var idReq = $('#idReq').val();
+            url = updateQueryStringParameter(url, 'idReq', idReq);
+            window.location = url;
+        }
+
+        function updateQueryStringParameter(uri, key, value) {
+            var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+            var separator = uri.indexOf('?') !== -1 ? "&" : "?";
+            if (uri.match(re)) {
+                return uri.replace(re, '$1' + key + "=" + value + '$2');
+            } else {
+                return uri + separator + key + "=" + value;
+            }
+        }
+    </script>
+}

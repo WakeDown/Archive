@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title – приложение ASP.NET</title>
+    <title>@ViewBag.Title</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
 </head>
@@ -52,6 +52,14 @@
         </a>
     </li>
 }
+@if (ViewBag.CurUser.HasAccess(AdGroup.ArchivePlacesEditor, AdGroup.ArchiveCreateRequest))
+{
+    <li>
+        <a href='@Url.Action("Index", "Request")' class="nav-btn-warning">
+            <i class="fa fa-folder-open-o"></i> Запросы
+        </a>
+    </li>
+}
                     @*<li>@Html.ActionLink("Новый запрос", "Request", "Home")</li>*@
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
@@ -85,6 +93,7 @@
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/sitejs")
     @RenderSection("scripts", required: false)
 </body>
 </html>

@@ -11,6 +11,9 @@ namespace ArchiveWeb
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
                         "~/Scripts/jquery-{version}.js"
                         ));
+            bundles.Add(new ScriptBundle("~/bundles/sitejs").Include(
+                       "~/Scripts/spinner.js"
+                       ));
 
             // Используйте версию Modernizr для разработчиков, чтобы учиться работать. Когда вы будете готовы перейти к работе,
             // используйте средство построения на сайте http://modernizr.com, чтобы выбрать только нужные тесты.

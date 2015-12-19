@@ -170,6 +170,11 @@ tr.doc-row:hover {
     cursor: pointer;
 }
 
+tr.table-row:hover {
+    background-color: #F7F1D4 !important;
+    cursor: pointer;
+}
+
 .no-pad-top {
     padding-top: 0 !important;
 }
@@ -221,4 +226,33 @@ tr.doc-row:hover {
 }
 .pad-l-sm {
     padding-left: 5px;
+}
+
+.spinner {
+  display: inline-block;
+  opacity: 0;
+  max-width: 0;
+
+  -webkit-transition: opacity 0.25s, max-width 0.45s; 
+  -moz-transition: opacity 0.25s, max-width 0.45s;
+  -o-transition: opacity 0.25s, max-width 0.45s;
+  transition: opacity 0.25s, max-width 0.45s; /* Duration fixed since we animate additional hidden width */
+}
+
+.spinner.on-input {
+    z-index:999;
+    position:absolute;
+    top: 7px;
+    left: 10px;
+}
+
+.spinner.on-element {
+    z-index:999;
+    position:absolute;
+}
+
+.spinner.active {
+    cursor:progress;
+  opacity: 1;
+  max-width: 50px; /* More than it will ever come, notice that this affects on animation duration */
 }

@@ -19,6 +19,7 @@ namespace ArchiveWeb.Models
         public int? IdDocType { get; set; }
         public string DocType { get; set; }
         public DateTime DocDate { get; set; }
+        public string DocDateStr => DocDate.ToString("dd.MM.yyyy");
         public int IdOrganization { get; set; }
         public string OrganizationUid { get; set; }
         public string Organization { get; set; }
@@ -56,6 +57,8 @@ namespace ArchiveWeb.Models
         public string FileName { get; set; }
         public string FileSid { get; set; }
         public bool Enabled { get; set; }
+        public bool IsRequested { get; set; }
+        public int IdRequest { get; set; }
 
         public Document() { }
 
@@ -106,6 +109,8 @@ namespace ArchiveWeb.Models
             Surname = Db.DbHelper.GetValueString(row, "surname");
             Name = Db.DbHelper.GetValueString(row, "name");
             Patronymic = Db.DbHelper.GetValueString(row, "patronymic");
+            IsRequested = Db.DbHelper.GetValueBool(row, "is_requested");
+            IdRequest = Db.DbHelper.GetValueIntOrDefault(row, "id_request");
 
             Place = new Place() {StackNumber = Db.DbHelper.GetValueString(row, "place_stack"),ShelfNumber = Db.DbHelper.GetValueIntOrDefault(row, "place_shelf"), FolderNumber = Db.DbHelper.GetValueIntOrDefault(row, "place_folder") };
         }
@@ -143,6 +148,23 @@ namespace ArchiveWeb.Models
             return lst;
             //var result = new ListResult<Claim>(lst, cnt);
             //return result;
+        }
+
+        public static IEnumerable<Document> GetRequestList(int idRequest)
+        {
+            SqlParameter pIdRequest = new SqlParameter() { ParameterName = "id_request", SqlValue = idRequest, SqlDbType = SqlDbType.Int };
+            var dt = Db.Archive.ExecuteQueryStoredProcedure("document_get_list", pIdRequest);
+            var lst = new List<Document>();
+
+            if (dt.Rows.Count > 0)
+            {
+                foreach (DataRow row in dt.Rows)
+                {
+                    var model = new Document(row);
+                    lst.Add(model);
+                }
+            }
+            return lst;
         }
 
         public static IEnumerable<Document> GetListBackup()
