@@ -25,6 +25,16 @@ namespace ArchiveWeb.Models
         {
         }
 
+        public DocRequest(int id)
+        {
+            SqlParameter pId = new SqlParameter() { ParameterName = "id", SqlValue = id, SqlDbType = SqlDbType.Int };
+            var dt = Db.Archive.ExecuteQueryStoredProcedure("request_get", pId);
+            if (dt.Rows.Count > 0)
+            {
+                FillSelf(dt.Rows[0]);
+            }
+        }
+
         public DocRequest(DataRow row)
         {
             FillSelf(row);
@@ -53,15 +63,22 @@ namespace ArchiveWeb.Models
             {
                 id = Db.DbHelper.GetValueIntOrDefault(dt.Rows[0], "id");
             }
-            string appHost = ConfigurationManager.AppSettings["appHost"];
-            string message = $"Добрый день.<br />Поступил новый запрос на выдачу документов из архива.<br />Автор запроса {AdHelper.GetUserBySid(creatorSid).ShortName}.<br />Ссылка на запрос - <a href=\"{appHost}/Request?idReq={id}\">{appHost}/Request?id={id}</a>";
-            message += $"<p>Список документов:<p>{GetDocListStr(id)}</p></p>";
+            
+            string message = $"Добрый день.<br />Поступил новый запрос на выдачу документов из архива.<br />Автор запроса {AdHelper.GetUserBySid(creatorSid).ShortName}.<br />Ссылка на запрос - {GetRequestLink(id)}";
+            message += $"<p>Список документов:<p>{GetDocListStr(id, true)}</p></p>";
 
             MessageHelper.SendMailSmtp($"[Архив запрос №{id}] Новый запрос", message, true, AdHelper.GetSpecialistMailList(AdGroup.ArchiveAddDoc));
             return id;
         }
 
-        public static string GetDocListStr(int id)
+        public static string GetRequestLink(int id)
+        {
+            string appHost = ConfigurationManager.AppSettings["appHost"];
+            string message =$"<a href=\"{appHost}/Request?idReq={id}\">{appHost}/Request?id={id}</a>";
+            return message;
+        }
+
+        public static string GetDocListStr(int id, bool getPlaces = false)
         {
             string message = String.Empty;
             var docs = GetDocumentList(id).OrderBy(x => x.Place.StackNumber).ThenBy(x => x.Place.ShelfNumber).ThenBy(x => x.Place.FolderNumber);
@@ -71,11 +88,15 @@ namespace ArchiveWeb.Models
                     "<style type=\"text\\css\">table {border-collapse:collapse; border:1px solid black;} table tr th, table tr td {border:1px solid black; padding: 5px;}</style>";
                 message += "<table>";
                 message +=
-                    "<tr><th>ID</th><th>Тип документа</th><th>№ документа</th><th>Дата документа</th><th>Контрагент</th><th>Стеллаж</th><th>Полка</th><th>Папка</th></tr>";
+                    "<tr><th>ID</th><th>Тип документа</th><th>№ документа</th><th>Дата документа</th><th>Контрагент</th>" +
+                   (getPlaces ? "<th>Стеллаж</th><th>Полка</th><th>Папка</th>":String.Empty) +
+                    "</tr>";
                 foreach (Document doc in docs)
                 {
                     message +=
-                        $"<tr style=\"border:1px solid black\"><td>{doc.Id}</td><td>{doc.DocType}</td><td>{doc.DocNumber}</td><td>{doc.DocDate:dd.MM.yyyy}</td><td>{doc.ContractorName}</td><td>{doc.Place.StackNumber}</td><td>{doc.Place.ShelfNumber}</td><td>{doc.Place.FolderNumber}</td></tr>";
+                        $"<tr style=\"border:1px solid black\"><td>{doc.Id}</td><td>{doc.DocType}</td><td>{doc.DocNumber}</td><td>{doc.DocDate:dd.MM.yyyy}</td><td>{doc.ContractorName}</td>" +
+                        (getPlaces ? $"<td>{doc.Place.StackNumber}</td><td>{doc.Place.ShelfNumber}</td><td>{doc.Place.FolderNumber}</td>" : String.Empty) +
+                        $"</tr>";
                 }
                 message += "</table>";
             }
@@ -85,15 +106,19 @@ namespace ArchiveWeb.Models
         public static void SetWork(string creatorSid, int id)
         {
             ChangeState(creatorSid, id, DocRequestState.GetWorkState().Id);
-            string message = "";
-            MessageHelper.SendMailSmtp($"[Архив запрос №{id}] Документы готовы к выдаче", message, true, AdHelper.GetUserBySid("").Email);
+            string message = $"Добрый день.<br />Документы по запросу №{id} готовы к выдаче.";
+            message += $"<br />Ссылка на запрос - {GetRequestLink(id)}";
+            message += $"<p>Список документов:<p>{GetDocListStr(id)}</p></p>";
+            string authorSid = new DocRequest(id).CraetorSid;
+            MessageHelper.SendMailSmtp($"[Архив запрос №{id}] Документы готовы к выдаче", message, true, AdHelper.GetUserBySid(authorSid).Email);
         }
 
         public static void ChangeState(string creatorSid, int id, int stateId)
         {
+            SqlParameter pId = new SqlParameter() { ParameterName = "id", SqlValue = id, SqlDbType = SqlDbType.Int };
             SqlParameter pStateId = new SqlParameter() { ParameterName = "id_state", SqlValue = stateId, SqlDbType = SqlDbType.Int };
             SqlParameter pCreatorSid = new SqlParameter() { ParameterName = "creator_sid", SqlValue = creatorSid, SqlDbType = SqlDbType.VarChar };
-            var dt = Db.Archive.ExecuteQueryStoredProcedure("request_change_state", pCreatorSid, pStateId);
+            var dt = Db.Archive.ExecuteQueryStoredProcedure("request_change_state", pId, pCreatorSid, pStateId);
         }
 
         public static IEnumerable<DocRequest> GetList(out int totalCount, int? idReq, string auth, string reqDate)

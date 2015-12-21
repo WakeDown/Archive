@@ -34,7 +34,7 @@
                     <td>
                         @if (request.State.SysName.Equals("SENT"))
                         {
-                            <button name="reqWork" class="btn btn-primary"><i class="fa fa-reorder"></i> Готов к выдаче</button>
+                            <button name="reqWork" class="btn btn-primary" reqId="@request.Id"><i class="fa fa-reorder"></i> Готов к выдаче</button>
                         }
                         else if (request.State.SysName.Equals("WORK"))
                         {
@@ -76,10 +76,13 @@
             $('[name="reqWork"]').click(function() {
                 showSpinnerAppend(this);
                 var $this = $(this);
+                var id = $this.attr('reqId');
                 $.ajax({
-                    url:'@Url.Action("")',
+                    url: '@Url.Action("SetRequestWork")',
+                    method: 'POST',
+                    data: {id:id},
                     success:function() {
-                        
+                        window.location.reload();
                         hideSpinner($this);
                     },
                     error: function () {
