@@ -292,5 +292,21 @@ namespace ArchiveWeb.Models
 
             var dt = Db.Archive.ExecuteQueryStoredProcedure("doc_close", pId, pCreatorAdSid);
         }
+
+        public IEnumerable<DocStateHistoryItem> GetStateHistory()
+        {
+            SqlParameter pId = new SqlParameter() { ParameterName = "id", SqlValue = Id, SqlDbType = SqlDbType.Int };
+            var dt = Db.Archive.ExecuteQueryStoredProcedure("document_get_state_history", pId);
+            var list = new List<DocStateHistoryItem>();
+            if (dt.Rows.Count > 0)
+            {
+                foreach (DataRow dr in dt.Rows)
+                {
+                    var d = new DocStateHistoryItem(dr);
+                    list.Add(d);
+                }
+            }
+            return list;
+        }
     }
 }

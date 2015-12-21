@@ -68,22 +68,16 @@
             </div>
         </td>
     }
-
-    @if (ViewBag.PlaceView != null && ViewBag.PlaceView)
+    <td>
+        
+    </td>
+    @*@if (ViewBag.PlaceView != null && ViewBag.PlaceView)
     {
         <td>
             @if (Model.DocStateSysName.Equals("NEW") || Model.DocStateSysName.Equals("OUT"))
             {
                 <a name="archive" class="btn btn-success btn-sm" title="В архив"><i class="fa fa-reply"></i></a>
-            }
-            @*else if (Model.DocStateSysName.Equals("ARCHIVE"))
-            {
-                <a name="out" class="btn btn-warning btn-sm" title="Выдать"><i class="fa fa-mail-forward"></i></a>
-            }*@
-        @*@if (ViewBag.RequestCreate != null && ViewBag.RequestCreate)
-        {
-            
-        }*@</td>
-    }
+            }</td>
+    }*@
 </tr>
 

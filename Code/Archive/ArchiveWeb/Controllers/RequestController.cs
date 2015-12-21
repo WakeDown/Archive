@@ -39,5 +39,20 @@ namespace ArchiveWeb.Controllers
             DocRequest.SetWork(CurUser.Sid, id);
             return Json(new { });
         }
+
+        [HttpPost]
+        public JsonResult SetRequestGiven(int id)
+        {
+            DocRequest.SetGiven(CurUser.Sid, id);
+            return Json(new { });
+        }
+
+        [HttpPost]
+        public JsonResult SetDocumentCame(int idDoc, int idReq)
+        {
+            DocRequest.SetDocumentCame(idDoc, idReq, CurUser.Sid);
+            
+            return Json(new { });
+        }
     }
 }

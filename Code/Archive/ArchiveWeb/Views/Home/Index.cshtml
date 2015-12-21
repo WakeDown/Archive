@@ -137,12 +137,9 @@
                 <input id="place" class="form-control input-xs" placeholder="Местоположение" value="@Request.QueryString["place"]"/>
             </th>
         }
-        @if (ViewBag.PlaceView != null && ViewBag.PlaceView)
-        {
             <th>
                 <a href="@Url.Action("Index")" class="btn btn-default btn-sm" title="очистить фильтр"><i class="fa fa-refresh"></i></a>
             </th>
-        }
     </tr>
     </thead>
     @foreach (Document doc in Model)

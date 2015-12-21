@@ -142,6 +142,7 @@
     <Compile Include="Models\Contractor.cs" />
     <Compile Include="Models\DocRequestState.cs" />
     <Compile Include="Models\DocState.cs" />
+    <Compile Include="Models\DocStateHistoryItem.cs" />
     <Compile Include="Models\DocType.cs" />
     <Compile Include="Models\Document.cs" />
     <Compile Include="Models\Employee.cs" />

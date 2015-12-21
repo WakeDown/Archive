@@ -38,99 +38,134 @@ else
 }
 else
 {
-    <div class="form-horizontal">
-        <div class="form-group">
-            <label class="col-lg-2 control-label no-pad-top" for="docType">Тип документа</label>
-            <div class="col-lg-4">
-                @if (String.IsNullOrEmpty(Model.FileSid))
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-lg-3 control-label no-pad-top" for="docType">Тип документа</label>
+                    <div class="col-lg-9">
+                        @if (String.IsNullOrEmpty(Model.FileSid))
+                        {
+                            @Model.DocType
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("GetDocFileData", new {sid = Model.FileSid})" target="_blank">@Model.DocType</a>
+                        }
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-3 control-label no-pad-top" for="docNumber">Номер документа</label>
+                    <div class="col-lg-9">
+                        @Model.DocNumber
+                    </div>
+                </div>
+                @if (Model.IdDocType == 7)
                 {
-                    @Model.DocType
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label no-pad-top">Дата приема сотрудника</label>
+                        <div class="col-lg-9">
+                            @Model.DocDate.ToString("dd.MM.yyyy")
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label no-pad-top">ФИО сотрудника</label>
+                        <div class="col-lg-9">
+                            @Model.Surname @Model.Name @Model.Patronymic
+                        </div>
+                    </div>
                 }
                 else
                 {
-                    <a href="@Url.Action("GetDocFileData", new {sid = Model.FileSid})" target="_blank">@Model.DocType</a>
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label no-pad-top" for="docDate">Дата документа</label>
+                        <div class="col-lg-9">
+                            @Model.DocDate.ToString("dd.MM.yyyy")
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label no-pad-top" for="docContractor">Контрагент</label>
+                        <div class="col-lg-9">
+                            @Model.ContractorName
+                            <div>
+                                <small id="contractorFullName">&nbsp;</small>
+                            </div>
+                        </div>
+                    </div>
                 }
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-lg-2 control-label no-pad-top" for="docNumber">Номер документа</label>
-            <div class="col-lg-2">
-                @Model.DocNumber
-            </div>
-        </div>
-        @if (Model.IdDocType == 7)
-        {
-            <div class="form-group">
-                <label class="col-lg-2 control-label no-pad-top" >Дата приема сотрудника</label>
-                <div class="col-lg-2">
-                    @Model.DocDate.ToString("dd.MM.yyyy")
+                <div class="form-group">
+                    <label class="col-lg-3 control-label no-pad-top" for="organization">Юр. лицо Юнит</label>
+                    <div class="col-lg-9">
+                        @Model.Organization
+                        <div>
+                            <small id="organizationFullName">&nbsp;</small>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label class="col-lg-2 control-label no-pad-top" >ФИО сотрудника</label>
-                <div class="col-lg-10">
-                    @Model.Surname @Model.Name @Model.Patronymic
+                <div class="form-group">
+                    <label class="col-lg-3 control-label no-pad-top" for="sheetCount">Количество листов</label>
+                    <div class="col-lg-9">
+                        @Model.SheetCount
+                    </div>
                 </div>
-            </div>
-        }
-        else
-        {
-            <div class="form-group">
-                <label class="col-lg-2 control-label no-pad-top" for="docDate">Дата документа</label>
-                <div class="col-lg-2">
-                    @Model.DocDate.ToString("dd.MM.yyyy")
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-lg-2 control-label no-pad-top" for="docContractor">Контрагент</label>
-                <div class="col-lg-10">
-                    @Model.ContractorName
-                    <div><small id="contractorFullName">&nbsp;</small>
+                @*<div class="form-group">
+                    <label class="col-lg-2 control-label no-pad-top" for="sheetCount">Скан</label>
+                    <div class="col-lg-2">
+                        <a href="@Url.Action("GetDocFileData", new {sid = Model.FileSid})" target="_blank">@Model.FileName</a>
+                    </div>
+                </div>*@
+                @if (ViewBag.PlaceView != null && ViewBag.PlaceView)
+                {
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label no-pad-top">Местоположение</label>
+                        <div class="col-lg-6">
+                            <table class="table table-bordered">
+                                <tr><td>Стеллаж</td><td>@(Model.Place.StackNumber ?? "неизвестно")</td></tr>
+                                <tr><td>Полка</td><td>@(Model.Place.ShelfNumber <= 0 ? "неизвестно" : Model.Place.ShelfNumber.ToString())</td></tr>
+                                <tr><td>Папка</td><td>@(Model.Place.FolderNumber <= 0 ? "неизвестно" : Model.Place.FolderNumber.ToString())</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                }
+                <div class="form-group">
+                    <div class="col-lg-push-3 col-lg-5">
+                        <a class="btn btn-primary btn-sm" href="@Url.Action("Index")">Назад</a>
                     </div>
                 </div>
             </div>
-        }
-        <div class="form-group">
-            <label class="col-lg-2 control-label no-pad-top" for="organization">Юр. лицо Юнит</label>
-            <div class="col-lg-10">
-                @Model.Organization
-                <div>
-                    <small id="organizationFullName">&nbsp;</small>
-                </div>
-            </div>
         </div>
-        <div class="form-group">
-            <label class="col-lg-2 control-label no-pad-top" for="sheetCount">Количество листов</label>
-            <div class="col-lg-2">
-                @Model.SheetCount
-            </div>
-        </div>
-        @*<div class="form-group">
-            <label class="col-lg-2 control-label no-pad-top" for="sheetCount">Скан</label>
-            <div class="col-lg-2">
-                <a href="@Url.Action("GetDocFileData", new {sid = Model.FileSid})" target="_blank">@Model.FileName</a>
-            </div>
-        </div>*@
-        @if (ViewBag.PlaceView != null && ViewBag.PlaceView)
-        {
-            <div class="form-group">
-                <label class="col-lg-2 control-label no-pad-top">Местоположение</label>
-                <div class="col-lg-4">
-                    <table class="table table-bordered">
-                        <tr><td>Стеллаж</td><td>@(Model.Place.StackNumber ?? "неизвестно")</td></tr>
-                        <tr><td>Полка</td><td>@(Model.Place.ShelfNumber <= 0 ? "неизвестно" : Model.Place.ShelfNumber.ToString())</td></tr>
-                        <tr><td>Папка</td><td>@(Model.Place.FolderNumber <= 0 ? "неизвестно" : Model.Place.FolderNumber.ToString())</td></tr>
-                    </table>
+        <div class="col-lg-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="nomargin">
+                        История запросов
+                    </h4>
                 </div>
-            </div>
-        }
-        <div class="form-group">
-            <div class="col-lg-push-2 col-lg-5">
-                <a class="btn btn-primary btn-sm" href="@Url.Action("Index")">Назад</a>
+                <div class="panel-body">
+                   @{
+                       var docHistory = Model.GetStateHistory();
+
+                       if (docHistory.Any())
+                       {
+                           foreach (DocStateHistoryItem item in docHistory)
+                           {
+                               <p>
+                                   <strong>@item.DateCreate.ToString("dd.MM.yyyy HH:mm")</strong> - @item.StateName
+                               <br/><small>@item.CreatorName</small>
+                                   <hr class="no-marg" />
+                               </p>
+                           }
+                       }
+                       else
+                       {
+                           @:пусто
+                       }
+                   }
+                </div>
             </div>
         </div>
     </div>
-}
+                       }
 }
 @section scripts
 {

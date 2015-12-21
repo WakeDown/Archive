@@ -1,4 +1,5 @@
 ﻿@using ArchiveWeb.Models
+@using ArchiveWeb.Objects
 @model IEnumerable<ArchiveWeb.Models.DocRequest>
 
 <table class="table table-bordered table-striped">
@@ -38,7 +39,7 @@
                         }
                         else if (request.State.SysName.Equals("WORK"))
                         {
-                            <button name="reqGiven" class="btn btn-warning"><i class="fa fa-mail-forward"></i> Выдан</button>
+                            <button name="reqGiven" class="btn btn-warning" reqId="@request.Id"><i class="fa fa-mail-forward"></i> Выдан</button>
                         }
                     </td>
                 </tr>
@@ -73,6 +74,23 @@
                     if (e.keyCode != 13) return;
                     search();
                 });
+            $('[name="reqGiven"]').click(function () {
+                showSpinnerAppend(this);
+                var $this = $(this);
+                var id = $this.attr('reqId');
+                $.ajax({
+                    url: '@Url.Action("SetRequestGiven")',
+                    method: 'POST',
+                    data: { id: id },
+                    success: function () {
+                        window.location.reload();
+                        hideSpinner($this);
+                    },
+                    error: function () {
+                        hideSpinner($this);
+                    }
+                });
+            });
             $('[name="reqWork"]').click(function() {
                 showSpinnerAppend(this);
                 var $this = $(this);
@@ -110,19 +128,37 @@
                     data: { idRequest: reqId },
                     success: function(data) {
                         if (data && data.length > 0) {
-                            
+
                             var $table = $('<table class="table table-bordered table-striped text-sm"></table>');
-                            $table.append($('<thead><tr class="bg-primary"><th>№ документа</th><th>Дата документа</th><th>Тип документа</th><th>Контрагент</th><th>Статус</th></tr></thead>'));
+                            $table.append($('<thead><tr class="bg-primary"><th>№ документа</th><th>Дата документа</th><th>Тип документа</th><th>Контрагент</th><th>Статус</th>' +
+                                @{
+                                    if (ViewBag.CurUser.HasAccess(AdGroup.ArchiveAddDoc))
+                                        {
+                                            <text>
+                                                '<th></th>' +                                        
+                                            </text>
+                                        }
+                                    }    
+                                '</tr></thead>'));
                             for (var i = 0; i < data.length; i++) {
                                 var item = data[i];
                                 var element = $('<tr><td>' + item.DocNumber + '</td><td>' + item.DocDateStr + '</td><td>' + item.DocType + '</td><td>' + item.ContractorName + '</td>' +
-                                    (showBtnCame==true ? '<td>' +
-                                            '<button name="docCame" class="btn btn-success btn-sm"><i class="fa fa-mail-reply"></i> Получен</button>' +
-                                        '</td>' : '') +
+                                    '<td>' + item.State + '</td><td>' +
+                                    @{
+                                        if (ViewBag.CurUser.HasAccess(AdGroup.ArchiveAddDoc))
+                                        {
+                                            <text>
+                                                (item.DocStateSysName == "OUT" ?
+                                            '<button idDoc="' + item.Id + '" idReq="' + reqId + '" name="docCame" class="btn btn-success btn-sm"><i class="fa fa-mail-reply"></i> Принят</button>' : '') +                                         
+                                            </text>
+                                        }
+                                    }       
+                                       '</td>' +
                                     '</tr>');
                                 $table.append(element);
                             }
                             $docsList.append($table);
+                            docCameBtnInit($table);
                             //$this.closest('[name=docCount]').remove();
                             $this.remove();
                         }
@@ -135,6 +171,29 @@
                 //$docsList.append();
             });
         });
+
+        function docCameBtnInit(container) {
+            var $cont = $(container);
+            $('[name="docCame"]', $cont).click(function() {
+                var $this = $(this);
+                showSpinnerAppend($this);
+                var idDoc = $this.attr('idDoc');
+                var idReq = $this.attr('idReq');
+                $.ajax({
+                    url: '@Url.Action("SetDocumentCame")',
+                    method: 'POST',
+                    data: { idDoc: idDoc, idReq: idReq },
+                    success: function () {
+                        window.location.reload();
+                        hideSpinner($this);
+                    },
+                    error:function() {
+                        alert('Ошибка!');
+                        hideSpinner($this);
+                    }
+                });
+            });
+        }
 
         function search() {
             var curUrl = '@Request.RawUrl';

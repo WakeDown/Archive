@@ -74,7 +74,7 @@ namespace ArchiveWeb.Models
         public static string GetRequestLink(int id)
         {
             string appHost = ConfigurationManager.AppSettings["appHost"];
-            string message =$"<a href=\"{appHost}/Request?idReq={id}\">{appHost}/Request?id={id}</a>";
+            string message =$"<a href=\"{appHost}/Request?idReq={id}\">{appHost}/Request?idReq={id}</a>";
             return message;
         }
 
@@ -105,12 +105,37 @@ namespace ArchiveWeb.Models
 
         public static void SetWork(string creatorSid, int id)
         {
-            ChangeState(creatorSid, id, DocRequestState.GetWorkState().Id);
+            SqlParameter pId = new SqlParameter() { ParameterName = "id_request", SqlValue = id, SqlDbType = SqlDbType.Int };
+            SqlParameter pCreatorSid = new SqlParameter() { ParameterName = "creator_sid", SqlValue = creatorSid, SqlDbType = SqlDbType.VarChar };
+            var dt = Db.Archive.ExecuteQueryStoredProcedure("request_state_work", pId, pCreatorSid);
+            //ChangeState(creatorSid, id, DocRequestState.GetWorkState().Id);
             string message = $"Добрый день.<br />Документы по запросу №{id} готовы к выдаче.";
             message += $"<br />Ссылка на запрос - {GetRequestLink(id)}";
             message += $"<p>Список документов:<p>{GetDocListStr(id)}</p></p>";
             string authorSid = new DocRequest(id).CraetorSid;
             MessageHelper.SendMailSmtp($"[Архив запрос №{id}] Документы готовы к выдаче", message, true, AdHelper.GetUserBySid(authorSid).Email);
+        }
+
+        public static void SetGiven(string creatorSid, int id)
+        {
+            SqlParameter pId = new SqlParameter() { ParameterName = "id_request", SqlValue = id, SqlDbType = SqlDbType.Int };
+            SqlParameter pCreatorSid = new SqlParameter() { ParameterName = "creator_sid", SqlValue = creatorSid, SqlDbType = SqlDbType.VarChar };
+            var dt = Db.Archive.ExecuteQueryStoredProcedure("request_state_given", pId, pCreatorSid);
+            //ChangeState(creatorSid, id, DocRequestState.GetGivenState().Id);
+            //ChangeDocumentState(creatorSid, id, DocState.GetOutState().Id);
+            //string message = $"Добрый день.<br />Документы по запросу №{id} готовы к выдаче.";
+            //message += $"<br />Ссылка на запрос - {GetRequestLink(id)}";
+            //message += $"<p>Список документов:<p>{GetDocListStr(id)}</p></p>";
+            //string authorSid = new DocRequest(id).CraetorSid;
+            //MessageHelper.SendMailSmtp($"[Архив запрос №{id}] Документы готовы к выдаче", message, true, AdHelper.GetUserBySid(authorSid).Email);
+        }
+
+        public static void ChangeDocumentState(string creatorSid, int idRequest, int docStateId)
+        {
+            SqlParameter pIdRequest = new SqlParameter() { ParameterName = "id_request", SqlValue = idRequest, SqlDbType = SqlDbType.Int };
+            SqlParameter pDocStateId = new SqlParameter() { ParameterName = "id_doc_state", SqlValue = docStateId, SqlDbType = SqlDbType.Int };
+            SqlParameter pCreatorSid = new SqlParameter() { ParameterName = "creator_sid", SqlValue = creatorSid, SqlDbType = SqlDbType.VarChar };
+            var dt = Db.Archive.ExecuteQueryStoredProcedure("request_change_doc_state", pIdRequest, pCreatorSid, pDocStateId);
         }
 
         public static void ChangeState(string creatorSid, int id, int stateId)
@@ -121,12 +146,13 @@ namespace ArchiveWeb.Models
             var dt = Db.Archive.ExecuteQueryStoredProcedure("request_change_state", pId, pCreatorSid, pStateId);
         }
 
-        public static IEnumerable<DocRequest> GetList(out int totalCount, int? idReq, string auth, string reqDate)
+        public static IEnumerable<DocRequest> GetList(out int totalCount, int? idReq, string auth, string reqDate, bool activeOnly = true)
         {
             SqlParameter pIdReq = new SqlParameter() { ParameterName = "id", SqlValue = idReq, SqlDbType = SqlDbType.NVarChar };
             SqlParameter pAuth = new SqlParameter() { ParameterName = "author", SqlValue = auth, SqlDbType = SqlDbType.NVarChar };
             SqlParameter pReqDate = new SqlParameter() { ParameterName = "request_date_str", SqlValue = reqDate, SqlDbType = SqlDbType.NVarChar };
-            var dt = Db.Archive.ExecuteQueryStoredProcedure("request_get_list", pIdReq, pAuth, pReqDate);
+            SqlParameter pActiveOnly = new SqlParameter() { ParameterName = "active_only", SqlValue = activeOnly, SqlDbType = SqlDbType.Bit };
+            var dt = Db.Archive.ExecuteQueryStoredProcedure("request_get_list", pIdReq, pAuth, pReqDate, pActiveOnly);
 
             totalCount = 0;
             var lst = new List<DocRequest>();
@@ -146,6 +172,15 @@ namespace ArchiveWeb.Models
         public static IEnumerable<Document> GetDocumentList(int idRequest)
         {
             return Document.GetRequestList(idRequest);
+        }
+
+        public static void SetDocumentCame(int idDoc, int idReq, string creatorSid)
+        {
+            //Document.SetArchiveState(idDoc, creatorSid);
+            SqlParameter pIdReq = new SqlParameter() { ParameterName = "id_request", SqlValue = idReq, SqlDbType = SqlDbType.Int };
+            SqlParameter pIdDoc = new SqlParameter() { ParameterName = "id_document", SqlValue = idDoc, SqlDbType = SqlDbType.Int };
+            SqlParameter pCreatorSid = new SqlParameter() { ParameterName = "creator_sid", SqlValue = creatorSid, SqlDbType = SqlDbType.VarChar };
+            var dt = Db.Archive.ExecuteQueryStoredProcedure("request_document_came", pIdReq, pIdDoc, pCreatorSid);
         }
     }
 }
