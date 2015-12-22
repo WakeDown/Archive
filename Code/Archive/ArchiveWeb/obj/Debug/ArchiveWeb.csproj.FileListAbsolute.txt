@@ -67,3 +67,6 @@ C:\GoogleDrive\Dev\GitHub\Archive\Code\Archive\ArchiveWeb\bin\ru\System.Web.WebP
 C:\GoogleDrive\Dev\GitHub\Archive\Code\Archive\ArchiveWeb\obj\Debug\ArchiveWeb.csprojResolveAssemblyReference.cache
 C:\GoogleDrive\Dev\GitHub\Archive\Code\Archive\ArchiveWeb\obj\Debug\ArchiveWeb.dll
 C:\GoogleDrive\Dev\GitHub\Archive\Code\Archive\ArchiveWeb\obj\Debug\ArchiveWeb.pdb
+C:\GoogleDrive\Dev\GitHub\Archive\Code\Archive\ArchiveWeb\bin\Select.Html.dep
+C:\GoogleDrive\Dev\GitHub\Archive\Code\Archive\ArchiveWeb\bin\Select.HtmlToPdf.dll
+C:\GoogleDrive\Dev\GitHub\Archive\Code\Archive\ArchiveWeb\bin\Select.HtmlToPdf.xml

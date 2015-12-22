@@ -1,21 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using ArchiveWeb.Models;
 using ArchiveWeb.Objects;
+using SelectPdf;
 
 namespace ArchiveWeb.Controllers
 {
     public class RequestController : BaseController
     {
         // GET: Request
-        public ActionResult Index(int? idReq, string auth, string reqDate)
+        public ActionResult Index(int? idReq, string auth, string reqDate, string doc)
         {
             if (!CurUser.HasAccess(AdGroup.ArchivePlacesEditor, AdGroup.ArchiveCreateRequest)) return HttpNotFound();
             int totalCount;
-            var list = DocRequest.GetList(out totalCount, idReq, auth, reqDate);
+            var list = DocRequest.GetList(out totalCount, idReq, auth, reqDate,true, doc);
 
                 return View(list);
         }
@@ -50,9 +52,30 @@ namespace ArchiveWeb.Controllers
         [HttpPost]
         public JsonResult SetDocumentCame(int idDoc, int idReq)
         {
-            DocRequest.SetDocumentCame(idDoc, idReq, CurUser.Sid);
+          bool reqDone = DocRequest.SetDocumentCame(idDoc, idReq, CurUser.Sid);
             
-            return Json(new { });
+            return Json(new { reqDone });
+        }
+
+        public ActionResult AktPdf(int? id)
+        {
+            HtmlToPdf converter = new HtmlToPdf();
+
+            string url = Url.Action("Akt", new { id });
+            var leftPartUrl = String.Format("{0}://{1}:{2}", Request.RequestContext.HttpContext.Request.Url.Scheme, Request.RequestContext.HttpContext.Request.Url.Host, Request.RequestContext.HttpContext.Request.Url.Port);
+            url = String.Format("{1}{0}", url, leftPartUrl);
+            PdfDocument doc = converter.ConvertUrl(url);
+            MemoryStream stream = new MemoryStream();
+            doc.Save(stream);
+            return File(stream.ToArray(), "application/pdf");
+        }
+        
+        public ActionResult Akt(int? id)
+        {
+            if (!id.HasValue) return HttpNotFound();
+            if (!CurUser.HasAccess(AdGroup.ArchiveAddDoc)) return HttpNotFound();
+            var req = new DocRequest(id.Value);
+            return View(req);
         }
     }
 }

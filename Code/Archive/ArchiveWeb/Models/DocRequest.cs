@@ -146,13 +146,14 @@ namespace ArchiveWeb.Models
             var dt = Db.Archive.ExecuteQueryStoredProcedure("request_change_state", pId, pCreatorSid, pStateId);
         }
 
-        public static IEnumerable<DocRequest> GetList(out int totalCount, int? idReq, string auth, string reqDate, bool activeOnly = true)
+        public static IEnumerable<DocRequest> GetList(out int totalCount, int? idReq, string auth, string reqDate, bool activeOnly = true, string doc = null)
         {
             SqlParameter pIdReq = new SqlParameter() { ParameterName = "id", SqlValue = idReq, SqlDbType = SqlDbType.NVarChar };
             SqlParameter pAuth = new SqlParameter() { ParameterName = "author", SqlValue = auth, SqlDbType = SqlDbType.NVarChar };
             SqlParameter pReqDate = new SqlParameter() { ParameterName = "request_date_str", SqlValue = reqDate, SqlDbType = SqlDbType.NVarChar };
             SqlParameter pActiveOnly = new SqlParameter() { ParameterName = "active_only", SqlValue = activeOnly, SqlDbType = SqlDbType.Bit };
-            var dt = Db.Archive.ExecuteQueryStoredProcedure("request_get_list", pIdReq, pAuth, pReqDate, pActiveOnly);
+            SqlParameter pDocument = new SqlParameter() { ParameterName = "document", SqlValue = doc, SqlDbType = SqlDbType.NVarChar };
+            var dt = Db.Archive.ExecuteQueryStoredProcedure("request_get_list", pIdReq, pAuth, pReqDate, pActiveOnly, pDocument);
 
             totalCount = 0;
             var lst = new List<DocRequest>();
@@ -174,13 +175,19 @@ namespace ArchiveWeb.Models
             return Document.GetRequestList(idRequest);
         }
 
-        public static void SetDocumentCame(int idDoc, int idReq, string creatorSid)
+        public static bool SetDocumentCame(int idDoc, int idReq, string creatorSid)
         {
             //Document.SetArchiveState(idDoc, creatorSid);
             SqlParameter pIdReq = new SqlParameter() { ParameterName = "id_request", SqlValue = idReq, SqlDbType = SqlDbType.Int };
             SqlParameter pIdDoc = new SqlParameter() { ParameterName = "id_document", SqlValue = idDoc, SqlDbType = SqlDbType.Int };
             SqlParameter pCreatorSid = new SqlParameter() { ParameterName = "creator_sid", SqlValue = creatorSid, SqlDbType = SqlDbType.VarChar };
             var dt = Db.Archive.ExecuteQueryStoredProcedure("request_document_came", pIdReq, pIdDoc, pCreatorSid);
+            bool reqDone = false;
+            if (dt.Rows.Count > 0)
+            {
+                reqDone = Db.DbHelper.GetValueBool(dt.Rows[0], "done");
+            }
+            return reqDone;
         }
     }
 }

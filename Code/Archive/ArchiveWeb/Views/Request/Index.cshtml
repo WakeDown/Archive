@@ -14,11 +14,18 @@
         <th class="text-nowrap">
             <input id="auth" class="form-control input-xs" placeholder="Автор запроса" value="@Request.QueryString["auth"]" />
         </th>
-        <th>Документы
-            <button class="btn btn-default btn-sm" id="showAllDocsList">Показать все <span class="badge">@Model.Sum(x=>x.DocsCount)</span></button>
+        <th style="width: 50%">
+            <div class="input-group">
+                <span class="input-group-btn">
+                    <button class="btn btn-default btn-xs" id="showAllDocsList">Показать все <span class="badge">@Model.Sum(x => x.DocsCount)</span></button>
+                </span>
+                <input id="doc" class="form-control input-xs" placeholder="№ документа | контрагент" value="@Request.QueryString["doc"]"/>
+            </div>
         </th>
         <th>Статус запроса</th>
-        <th class="min-width"></th>
+        <th class="min-width">
+            <a href="@Url.Action("Index")" class="btn btn-default btn-sm" title="очистить фильтр"><i class="fa fa-refresh"></i></a>
+        </th>
     </tr>
     </thead>
     <tbody>
@@ -35,12 +42,13 @@
                     <td>
                         @if (request.State.SysName.Equals("SENT"))
                         {
-                            <button name="reqWork" class="btn btn-primary" reqId="@request.Id"><i class="fa fa-reorder"></i> Готов к выдаче</button>
+                            <button name="reqWork" class="btn btn-primary btn-sm" reqId="@request.Id"><i class="fa fa-reorder"></i> Готов к выдаче</button>
                         }
                         else if (request.State.SysName.Equals("WORK"))
                         {
-                            <button name="reqGiven" class="btn btn-warning" reqId="@request.Id"><i class="fa fa-mail-forward"></i> Выдан</button>
+                            <button name="reqGiven" class="btn btn-warning btn-sm" reqId="@request.Id"><i class="fa fa-mail-forward"></i> Выдан</button>
                         }
+                        <button name="printAkt" class="btn btn-default btn-sm" reqId="@request.Id"><i class="fa fa-print"></i> Печать акта</button>
                     </td>
                 </tr>
             }
@@ -58,23 +66,32 @@
 @section scripts
 {
     <script type="text/javascript">
-        $(function () {
+        $(function() {
             $('#idReq').keypress(
-                function (e) {
+                function(e) {
                     if (e.keyCode != 13) return;
                     search();
                 });
             $('#reqDate').keypress(
-                function (e) {
+                function(e) {
                     if (e.keyCode != 13) return;
                     search();
                 });
             $('#auth').keypress(
-                function (e) {
+                function(e) {
                     if (e.keyCode != 13) return;
                     search();
                 });
-            $('[name="reqGiven"]').click(function () {
+            $('#doc').keypress(
+                function(e) {
+                    if (e.keyCode != 13) return;
+                    search();
+                });
+            $('[name="printAkt"]').click(function () {
+                var id = $(this).attr('reqId');
+                window.open('@Url.Action("AktPdf")?id=' + id);
+            });
+            $('[name="reqGiven"]').click(function() {
                 showSpinnerAppend(this);
                 var $this = $(this);
                 var id = $this.attr('reqId');
@@ -82,11 +99,11 @@
                     url: '@Url.Action("SetRequestGiven")',
                     method: 'POST',
                     data: { id: id },
-                    success: function () {
+                    success: function() {
                         window.location.reload();
                         hideSpinner($this);
                     },
-                    error: function () {
+                    error: function() {
                         hideSpinner($this);
                     }
                 });
@@ -98,12 +115,12 @@
                 $.ajax({
                     url: '@Url.Action("SetRequestWork")',
                     method: 'POST',
-                    data: {id:id},
-                    success:function() {
+                    data: { id: id },
+                    success: function() {
                         window.location.reload();
                         hideSpinner($this);
                     },
-                    error: function () {
+                    error: function() {
                         hideSpinner($this);
                     }
                 });
@@ -114,85 +131,98 @@
                 for (var i = 0; i < btns.length; i++) {
                     btns[i].click();
                 }
-                $(this).remove();
+                hideSpinner(this);
+                //$(this).remove();
             });
-            $('[name=showDocsList]').click(function () {
+            $('[name=showDocsList]').click(function() {
                 showSpinnerAppend(this);
                 var $this = $(this);
                 var reqId = $this.attr('reqId');
                 var $docsList = $this.closest('[name=docsList]');
-                var showBtnCame = $this.attr('showCame') === 'showCame';
-                $.ajax({
-                    url: '@Url.Action("GetDocumentList")',
-                    method: 'POST',
-                    data: { idRequest: reqId },
-                    success: function(data) {
-                        if (data && data.length > 0) {
-
-                            var $table = $('<table class="table table-bordered table-striped text-sm"></table>');
-                            $table.append($('<thead><tr class="bg-primary"><th>№ документа</th><th>Дата документа</th><th>Тип документа</th><th>Контрагент</th><th>Статус</th>' +
-                                @{
-                                    if (ViewBag.CurUser.HasAccess(AdGroup.ArchiveAddDoc))
-                                        {
-                                            <text>
-                                                '<th></th>' +                                        
-                                            </text>
-                                        }
-                                    }    
-                                '</tr></thead>'));
-                            for (var i = 0; i < data.length; i++) {
-                                var item = data[i];
-                                var element = $('<tr><td>' + item.DocNumber + '</td><td>' + item.DocDateStr + '</td><td>' + item.DocType + '</td><td>' + item.ContractorName + '</td>' +
-                                    '<td>' + item.State + '</td><td>' +
-                                    @{
-                                        if (ViewBag.CurUser.HasAccess(AdGroup.ArchiveAddDoc))
-                                        {
-                                            <text>
-                                                (item.DocStateSysName == "OUT" ?
-                                            '<button idDoc="' + item.Id + '" idReq="' + reqId + '" name="docCame" class="btn btn-success btn-sm"><i class="fa fa-mail-reply"></i> Принят</button>' : '') +                                         
-                                            </text>
-                                        }
-                                    }       
-                                       '</td>' +
-                                    '</tr>');
-                                $table.append(element);
-                            }
-                            $docsList.append($table);
-                            docCameBtnInit($table);
-                            //$this.closest('[name=docCount]').remove();
-                            $this.remove();
-                        }
-                    },
-                    error:function() {
-                        alert('Ошибка!');
-                        hideSpinner($this);
-                    }
-                });
-                //$docsList.append();
+                docTableLoad(reqId, $docsList);
+                $this.remove();
             });
         });
 
         function docCameBtnInit(container) {
             var $cont = $(container);
             $('[name="docCame"]', $cont).click(function() {
-                var $this = $(this);
-                showSpinnerAppend($this);
-                var idDoc = $this.attr('idDoc');
-                var idReq = $this.attr('idReq');
-                $.ajax({
-                    url: '@Url.Action("SetDocumentCame")',
-                    method: 'POST',
-                    data: { idDoc: idDoc, idReq: idReq },
-                    success: function () {
-                        window.location.reload();
-                        hideSpinner($this);
-                    },
-                    error:function() {
-                        alert('Ошибка!');
-                        hideSpinner($this);
+                    var $this = $(this);
+                    showSpinnerAppend($this);
+                    var idDoc = $this.attr('idDoc');
+                    var idReq = $this.attr('idReq');
+                    $.ajax({
+                        url: '@Url.Action("SetDocumentCame")',
+                        method: 'POST',
+                        data: { idDoc: idDoc, idReq: idReq },
+                        success: function(data) {
+                            if (data.reqDone == true) {
+                                window.location.reload();
+                            } else {
+                                var $docsList = $this.closest('[name=docsList]');
+                                $docsList.find('table').remove();
+                                docTableLoad(idReq, $docsList);
+                                $this.remove();
+                                //window.location.reload();
+                                //hideSpinner($this);
+                        }
+                },
+                error: function() {
+                alert('Ошибка!');
+                hideSpinner($this);
+            }
+        });
+    });
+    }
+
+        function docTableLoad(reqId, $container) {
+            //var showBtnCame = $this.attr('showCame') === 'showCame';
+            $.ajax({
+                url: '@Url.Action("GetDocumentList")',
+                method: 'POST',
+                data: { idRequest: reqId },
+                success: function(data) {
+                    if (data && data.length > 0) {
+
+                        var $table = $('<table class="table table-bordered table-striped text-sm"></table>');
+                        $table.append($('<thead><tr class="bg-primary"><th>№ документа</th><th>Дата документа</th><th>Тип документа</th><th>Контрагент</th><th>Статус</th>' +
+                            @{
+                                if (ViewBag.CurUser.HasAccess(AdGroup.ArchiveAddDoc))
+                                {
+                                    <text>
+                                            '<th></th>' +                                        
+                                        </text>
+                                }
+                            }    
+                            '</tr></thead>'));
+                        for (var i = 0; i < data.length; i++) {
+                            var item = data[i];
+                            var element = $('<tr><td>' + item.DocNumber + '</td><td>' + item.DocDateStr + '</td><td>' + item.DocType + '</td><td>' + item.ContractorName + '</td>' +
+                                '<td>' + item.State + '</td><td>' +
+                                @{
+                                    if (ViewBag.CurUser.HasAccess(AdGroup.ArchiveAddDoc))
+                                    {
+                                        <text>
+                                                (item.DocStateSysName == "OUT" ?
+                                            '<button idDoc="' + item.Id + '" idReq="' + reqId + '" name="docCame" class="btn btn-success btn-sm"><i class="fa fa-mail-reply"></i> Принят</button>' : '') +                                         
+                                            </text>
+                                    }
+                                }       
+                                '</td>' +
+                                '</tr>');
+                            $table.append(element);
+                        }
+                        $container.append($table);
+                        docCameBtnInit($table);
+                        //$this.closest('[name=docCount]').remove();
+
                     }
-                });
+                },
+                error: function() {
+                    alert('Ошибка!');
+                }
             });
+            //$docsList.append();
         }
 
         function search() {
@@ -204,6 +234,8 @@
             url = updateQueryStringParameter(url, 'auth', auth);
             var idReq = $('#idReq').val();
             url = updateQueryStringParameter(url, 'idReq', idReq);
+            var doc = $('#doc').val();
+            url = updateQueryStringParameter(url, 'doc', doc);
             window.location = url;
         }
 
