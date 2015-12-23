@@ -31,14 +31,23 @@
         .print {
             page-break-after: always;
         }
+
         table {
-            
-        }
-        table tr td, table tr th {
-            padding: 5px;
         }
 
-        table.bordered {border-collapse:collapse; border:1px solid black;} table.bordered tr th, table.bordered tr td {border:1px solid black; padding: 5px;}
+            table tr td, table tr th {
+                padding: 5px;
+            }
+
+            table.bordered {
+                border-collapse: collapse;
+                border: 1px solid black;
+            }
+
+                table.bordered tr th, table.bordered tr td {
+                    border: 1px solid black;
+                    padding: 5px;
+                }
     </style>
 </head>
 <body>
@@ -63,24 +72,42 @@
             </tr>
         </table>
         <p>
-            <p>
-                Список документов:
-            </p>
-            @{
-                var docs = DocRequest.GetDocumentList(ViewBag.CurUser, Model.Id);
+        <p>
+            Список документов:
+        </p>
+        @{
+            IEnumerable<Document> docs = DocRequest.GetDocumentList(ViewBag.CurUser, Model.Id);
 
-                if (docs.Any())
-                {
+            if (docs.Any())
+            {
 
-                    <table class="bordered">
-                        <tr><th>ID</th><th>Тип документа</th><th>№ документа</th><th>Дата документа</th><th>Контрагент</th><th>Стеллаж</th><th>Полка</th><th>Папка</th> </tr>
-                        @foreach (Document doc in docs)
-                        {
-                            <tr style="border: 1px solid black"><td>@doc.Id</td><td>@doc.DocType</td><td>@doc.DocNumber</td><td>@doc.DocDate.ToString("dd.MM.yyyy")</td><td>@doc.ContractorName</td><td>@doc.Place.StackNumber</td><td>@doc.Place.ShelfNumber</td><td>@doc.Place.FolderNumber</td></tr>
-                        }
-                    </table>
-                }
+                <table class="bordered">
+                    <tr><th>ID</th><th>Тип документа</th><th>№ документа</th><th>Дата документа</th><th>Контрагент</th><th>Стеллаж</th><th>Полка</th><th>Папка</th> </tr>
+                    @foreach (Document doc in docs)
+                    {
+                        <tr style="border: 1px solid black">
+                            <td>@doc.Id</td>
+                            <td>@doc.DocType</td>
+                            <td>@doc.DocNumber</td>
+                            <td>@doc.DocDate.ToString("dd.MM.yyyy")</td>
+                            @if (doc.IdDocType == 7)
+                            {
+                                <td>
+                                    @(String.Format("{0} {1} {2}", doc.Surname, doc.Name, doc.Patronymic))
+                                </td>
+                            }
+                            else
+                            {
+                                <td>@doc.ContractorName</td>
+                            }
+                            <td>@doc.Place.StackNumber</td>
+                            <td>@doc.Place.ShelfNumber</td>
+                            <td>@doc.Place.FolderNumber</td>
+                        </tr>
+                    }
+                </table>
             }
+        }
         </p>
     </div>
 </body>

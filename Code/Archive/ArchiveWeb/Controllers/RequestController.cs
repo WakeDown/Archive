@@ -32,7 +32,7 @@ namespace ArchiveWeb.Controllers
         public JsonResult GetDocumentList(int idRequest)
         {
             int totalCount;
-            var list = Document.GetList(CurUser, out totalCount, idRequest:idRequest);
+            var list = Document.GetList(CurUser, out totalCount, topRows: 10000, idRequest:idRequest);
             return Json(list);
         }
 

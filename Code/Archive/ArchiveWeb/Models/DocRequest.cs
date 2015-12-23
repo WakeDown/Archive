@@ -94,7 +94,9 @@ namespace ArchiveWeb.Models
                 foreach (Document doc in docs)
                 {
                     message +=
-                        $"<tr style=\"border:1px solid black\"><td>{doc.Id}</td><td>{doc.DocType}</td><td>{doc.DocNumber}</td><td>{doc.DocDate:dd.MM.yyyy}</td><td>{doc.ContractorName}</td>" +
+                        $"<tr style=\"border:1px solid black\"><td>{doc.Id}</td><td>{doc.DocType}</td><td>{doc.DocNumber}</td><td>{doc.DocDate:dd.MM.yyyy}</td>" +
+                        (doc.IdDocType == 7 ? $"<td>{doc.Surname} {doc.Name} {doc.Patronymic}</td>":$"<td>{doc.ContractorName}</td>") +
+                    $"<td>{doc.ContractorName}</td>" +
                         (getPlaces ? $"<td>{doc.Place.StackNumber}</td><td>{doc.Place.ShelfNumber}</td><td>{doc.Place.FolderNumber}</td>" : String.Empty) +
                         $"</tr>";
                 }
@@ -173,7 +175,7 @@ namespace ArchiveWeb.Models
         public static IEnumerable<Document> GetDocumentList(AdUser curUser, int idRequest)
         {
             int totalCount;
-            return Document.GetList(curUser, out totalCount, idRequest: idRequest).ToList().OrderBy(x => x.Place.StackNumber).ThenBy(x => x.Place.ShelfNumber).ThenBy(x => x.Place.FolderNumber);
+            return Document.GetList(curUser, out totalCount, topRows: 10000, idRequest: idRequest).OrderBy(x => x.Place.StackNumber).ThenBy(x => x.Place.ShelfNumber).ThenBy(x => x.Place.FolderNumber).ToList();
         }
 
         public static bool SetDocumentCame(int idDoc, int idReq, string creatorSid)
