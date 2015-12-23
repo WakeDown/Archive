@@ -24,21 +24,22 @@ namespace ArchiveWeb.Controllers
         [HttpPost]
         public JsonResult CreateRequest(int[] ids)
         {
-            int id = DocRequest.Create(CurUser.Sid, ids);
+            int id = DocRequest.Create(CurUser, CurUser.Sid, ids);
             return Json(new {id=id });
         }
 
         [HttpPost]
         public JsonResult GetDocumentList(int idRequest)
         {
-            var list = DocRequest.GetDocumentList(idRequest);
+            int totalCount;
+            var list = Document.GetList(CurUser, out totalCount, idRequest:idRequest);
             return Json(list);
         }
 
         [HttpPost]
         public JsonResult SetRequestWork(int id)
         {
-            DocRequest.SetWork(CurUser.Sid, id);
+            DocRequest.SetWork(CurUser, CurUser.Sid, id);
             return Json(new { });
         }
 

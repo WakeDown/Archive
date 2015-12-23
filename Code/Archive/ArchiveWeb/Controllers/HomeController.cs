@@ -18,8 +18,8 @@ namespace ArchiveWeb.Controllers
             //ViewBag.CurUser = GetCurUser();
             //ViewBag.DocumentList = new List<Document>() { new Document() { DocNumber = "123" }, new Document() { DocNumber = "321" }, new Document() { DocNumber = "123" }, new Document() { DocNumber = "321" } }; 
             int totalCount;
-            bool t2CardView = CurUser.HasAccess(AdGroup.ArchiveT2CardView);
-            var lst = Document.GetList(out totalCount, topRows, page, docNum, docDate, docType, dateCreate, state, place, idDoc, contractor, t2CardView);
+            //bool t2CardView = CurUser.HasAccess(AdGroup.ArchiveT2CardView);
+            var lst = Document.GetList(CurUser, out totalCount, topRows, page, docNum, docDate, docType, dateCreate, state, place, idDoc, contractor);
             ViewBag.TotalCount = totalCount;
             ViewBag.PlaceView = CurUser.HasAccess(AdGroup.ArchiveAddDoc);
             ViewBag.RequestCreate = CurUser.HasAccess(AdGroup.ArchiveCreateRequest);

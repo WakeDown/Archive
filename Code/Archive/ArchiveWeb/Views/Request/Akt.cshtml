@@ -67,7 +67,7 @@
                 Список документов:
             </p>
             @{
-                var docs = DocRequest.GetDocumentList(Model.Id).OrderBy(x => x.Place.StackNumber).ThenBy(x => x.Place.ShelfNumber).ThenBy(x => x.Place.FolderNumber);
+                var docs = DocRequest.GetDocumentList(ViewBag.CurUser, Model.Id);
 
                 if (docs.Any())
                 {

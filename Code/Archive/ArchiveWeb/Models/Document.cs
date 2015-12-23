@@ -115,8 +115,9 @@ namespace ArchiveWeb.Models
             Place = new Place() {StackNumber = Db.DbHelper.GetValueString(row, "place_stack"),ShelfNumber = Db.DbHelper.GetValueIntOrDefault(row, "place_shelf"), FolderNumber = Db.DbHelper.GetValueIntOrDefault(row, "place_folder") };
         }
 
-        public static IEnumerable<Document> GetList(out int totalCount, int? topRows = null, int? pageNum = null, string docNum = null, string docDate=null, string docType = null, string dateCreate = null, string state = null, string place = null, string id = null, string contractor = null, bool t2cardView = false)
+        public static IEnumerable<Document> GetList(AdUser curUser, out int totalCount, int? topRows = null, int? pageNum = null, string docNum = null, string docDate=null, string docType = null, string dateCreate = null, string state = null, string place = null, string id = null, string contractor = null, int? idRequest = null)
         {
+            bool t2CardView = curUser.HasAccess(AdGroup.ArchiveT2CardView);
             if (!topRows.HasValue) topRows = 30;
             if (!pageNum.HasValue) pageNum = 1;
 
@@ -130,8 +131,9 @@ namespace ArchiveWeb.Models
             SqlParameter pPlace = new SqlParameter() { ParameterName = "place", SqlValue = place, SqlDbType = SqlDbType.NVarChar };
             SqlParameter pId = new SqlParameter() { ParameterName = "id", SqlValue = id, SqlDbType = SqlDbType.NVarChar };
             SqlParameter pContractor = new SqlParameter() { ParameterName = "contractor", SqlValue = contractor, SqlDbType = SqlDbType.NVarChar };
-            SqlParameter pT2CardView = new SqlParameter() { ParameterName = "t2card_view", SqlValue = t2cardView, SqlDbType = SqlDbType.Bit };
-            var dt = Db.Archive.ExecuteQueryStoredProcedure("document_get_list", pTopRows, pPageNum, pDocNum, pDocDate, pDocType, pDateCreate, pState, pPlace, pId, pContractor, pT2CardView);
+            SqlParameter pT2CardView = new SqlParameter() { ParameterName = "t2card_view", SqlValue = t2CardView, SqlDbType = SqlDbType.Bit };
+            SqlParameter pIdRequest = new SqlParameter() { ParameterName = "id_request", SqlValue = idRequest, SqlDbType = SqlDbType.Int };
+            var dt = Db.Archive.ExecuteQueryStoredProcedure("document_get_list", pTopRows, pPageNum, pDocNum, pDocDate, pDocType, pDateCreate, pState, pPlace, pId, pContractor, pT2CardView, pIdRequest);
 
             totalCount = 0;
             var lst = new List<Document>();
@@ -150,22 +152,22 @@ namespace ArchiveWeb.Models
             //return result;
         }
 
-        public static IEnumerable<Document> GetRequestList(int idRequest)
-        {
-            SqlParameter pIdRequest = new SqlParameter() { ParameterName = "id_request", SqlValue = idRequest, SqlDbType = SqlDbType.Int };
-            var dt = Db.Archive.ExecuteQueryStoredProcedure("document_get_list", pIdRequest);
-            var lst = new List<Document>();
+        //public static IEnumerable<Document> GetRequestList(int idRequest)
+        //{
+        //    SqlParameter pIdRequest = new SqlParameter() { ParameterName = "id_request", SqlValue = idRequest, SqlDbType = SqlDbType.Int };
+        //    var dt = Db.Archive.ExecuteQueryStoredProcedure("document_get_list", pIdRequest);
+        //    var lst = new List<Document>();
 
-            if (dt.Rows.Count > 0)
-            {
-                foreach (DataRow row in dt.Rows)
-                {
-                    var model = new Document(row);
-                    lst.Add(model);
-                }
-            }
-            return lst;
-        }
+        //    if (dt.Rows.Count > 0)
+        //    {
+        //        foreach (DataRow row in dt.Rows)
+        //        {
+        //            var model = new Document(row);
+        //            lst.Add(model);
+        //        }
+        //    }
+        //    return lst;
+        //}
 
         public static IEnumerable<Document> GetListBackup()
         {

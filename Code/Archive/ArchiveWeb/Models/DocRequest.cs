@@ -51,7 +51,7 @@ namespace ArchiveWeb.Models
             State=new DocRequestState() {Id= StateId , Name = Db.DbHelper.GetValueString(row, "request_state_name"), SysName = Db.DbHelper.GetValueString(row, "request_state_sys_name"), IsOut = Db.DbHelper.GetValueBool(row, "request_state_is_out"), IsEnd = Db.DbHelper.GetValueBool(row, "request_state_is_end") };
         }
 
-        public static int Create(string creatorSid, int[] docsIds)
+        public static int Create(AdUser curUser, string creatorSid, int[] docsIds)
         {
             int id = 0;
             string ids = string.Join(",", docsIds);
@@ -65,7 +65,7 @@ namespace ArchiveWeb.Models
             }
             
             string message = $"Добрый день.<br />Поступил новый запрос на выдачу документов из архива.<br />Автор запроса {AdHelper.GetUserBySid(creatorSid).ShortName}.<br />Ссылка на запрос - {GetRequestLink(id)}";
-            message += $"<p>Список документов:<p>{GetDocListStr(id, true)}</p></p>";
+            message += $"<p>Список документов:<p>{GetDocListStr(curUser, id, true)}</p></p>";
 
             MessageHelper.SendMailSmtp($"[Архив запрос №{id}] Новый запрос", message, true, AdHelper.GetSpecialistMailList(AdGroup.ArchiveAddDoc));
             return id;
@@ -78,10 +78,10 @@ namespace ArchiveWeb.Models
             return message;
         }
 
-        public static string GetDocListStr(int id, bool getPlaces = false)
+        public static string GetDocListStr(AdUser curUser, int id, bool getPlaces = false)
         {
             string message = String.Empty;
-            var docs = GetDocumentList(id).OrderBy(x => x.Place.StackNumber).ThenBy(x => x.Place.ShelfNumber).ThenBy(x => x.Place.FolderNumber);
+            var docs = GetDocumentList(curUser, id).OrderBy(x => x.Place.StackNumber).ThenBy(x => x.Place.ShelfNumber).ThenBy(x => x.Place.FolderNumber);
             if (docs.Any())
             {
                 message +=
@@ -103,7 +103,7 @@ namespace ArchiveWeb.Models
             return message;
         }
 
-        public static void SetWork(string creatorSid, int id)
+        public static void SetWork(AdUser curUser,string creatorSid, int id)
         {
             SqlParameter pId = new SqlParameter() { ParameterName = "id_request", SqlValue = id, SqlDbType = SqlDbType.Int };
             SqlParameter pCreatorSid = new SqlParameter() { ParameterName = "creator_sid", SqlValue = creatorSid, SqlDbType = SqlDbType.VarChar };
@@ -111,7 +111,7 @@ namespace ArchiveWeb.Models
             //ChangeState(creatorSid, id, DocRequestState.GetWorkState().Id);
             string message = $"Добрый день.<br />Документы по запросу №{id} готовы к выдаче.";
             message += $"<br />Ссылка на запрос - {GetRequestLink(id)}";
-            message += $"<p>Список документов:<p>{GetDocListStr(id)}</p></p>";
+            message += $"<p>Список документов:<p>{GetDocListStr(curUser, id)}</p></p>";
             string authorSid = new DocRequest(id).CraetorSid;
             MessageHelper.SendMailSmtp($"[Архив запрос №{id}] Документы готовы к выдаче", message, true, AdHelper.GetUserBySid(authorSid).Email);
         }
@@ -170,9 +170,10 @@ namespace ArchiveWeb.Models
             return lst;
         }
 
-        public static IEnumerable<Document> GetDocumentList(int idRequest)
+        public static IEnumerable<Document> GetDocumentList(AdUser curUser, int idRequest)
         {
-            return Document.GetRequestList(idRequest);
+            int totalCount;
+            return Document.GetList(curUser, out totalCount, idRequest: idRequest).ToList().OrderBy(x => x.Place.StackNumber).ThenBy(x => x.Place.ShelfNumber).ThenBy(x => x.Place.FolderNumber);
         }
 
         public static bool SetDocumentCame(int idDoc, int idReq, string creatorSid)
